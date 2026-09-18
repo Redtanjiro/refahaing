@@ -220,36 +220,17 @@ a{color:inherit}
   font-size:clamp(19px,2.3vw,28px);letter-spacing:-.05em;line-height:1.25;
 }
 
-.diagram{display:block;width:100%;height:auto;max-height:70vh;margin:0 auto}
-
 /* ---- the diagrams demonstrate the mechanism, on a loop ---- */
 .an{animation-play-state:paused}
 .slide.on .an{animation-play-state:running}
 
-/* dragging the handle: the axes go with it */
-@keyframes ahaX{0%,100%{transform:translateX(0)}26%{transform:translateX(-34px)}56%{transform:translateX(30px)}82%{transform:translateX(-13px)}}
-@keyframes ahaY{0%,100%{transform:translateY(0)}26%{transform:translateY(-19px)}56%{transform:translateY(15px)}82%{transform:translateY(22px)}}
-@keyframes ahaXY{0%,100%{transform:translate(0,0)}26%{transform:translate(-34px,-19px)}56%{transform:translate(30px,15px)}82%{transform:translate(-13px,22px)}}
-.dx{animation:ahaX 11s ease-in-out infinite}
-.dy{animation:ahaY 11s ease-in-out infinite}
-.dxy{animation:ahaXY 11s ease-in-out infinite}
-
-/* the shelf restocking under the crosshair */
-@keyframes restock{0%,100%{transform:scaleY(1)}32%{transform:scaleY(.48)}66%{transform:scaleY(1.32)}}
-.bk{transform-box:fill-box;transform-origin:50% 100%;animation:restock 5.5s ease-in-out infinite}
-.shelfA .bk:nth-child(2){animation-delay:.22s}
-.shelfA .bk:nth-child(3){animation-delay:.44s}
-.shelfA .bk:nth-child(4){animation-delay:.66s}
-.shelfA .bk:nth-child(5){animation-delay:.88s}
-.shelfA .bk:nth-child(6){animation-delay:1.1s}
-
 /* the riffle, running in the arrow's direction */
 @keyframes tipover{0%,40%,100%{transform:rotate(0)}13%{transform:rotate(-32deg)}26%{transform:rotate(0)}}
 .tip{transform-box:fill-box;transform-origin:50% 100%;animation:tipover 3.6s ease-in-out infinite}
-.shelfC .tip:nth-child(2),.mk3 .tip:nth-child(2){animation-delay:.1s}
-.shelfC .tip:nth-child(3),.mk3 .tip:nth-child(3){animation-delay:.2s}
-.shelfC .tip:nth-child(4),.mk3 .tip:nth-child(4){animation-delay:.3s}
-.shelfC .tip:nth-child(5),.mk3 .tip:nth-child(5){animation-delay:.4s}
+.mk3 .tip:nth-child(2){animation-delay:.1s}
+.mk3 .tip:nth-child(3){animation-delay:.2s}
+.mk3 .tip:nth-child(4){animation-delay:.3s}
+.mk3 .tip:nth-child(5){animation-delay:.4s}
 .mk3 .tip:nth-child(6){animation-delay:.5s}
 .mk3 .tip:nth-child(7){animation-delay:.6s}
 .mk3 .tip:nth-child(8){animation-delay:.7s}
@@ -277,13 +258,27 @@ a{color:inherit}
 .tx{animation:travelX 6s ease-in-out infinite}
 .ty{animation:travelY 6s ease-in-out infinite}
 .txy{animation:travelXY 6s ease-in-out infinite}
-.steps{display:none}
-.steps figure{margin:0;display:flex;flex-direction:column;align-items:center}
-.mini{display:block;width:100%;max-width:300px;height:auto}
-.steps figcaption{
-  margin-top:10px;padding-top:11px;border-top:1px solid var(--ink);
-  width:100%;max-width:300px;text-align:left;
-  font-style:italic;font-size:15px;letter-spacing:-.05em;line-height:1.3;
+.panels{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  width:100%;max-width:1180px;margin:0 auto;text-align:left;
+}
+.panel{
+  margin:0;padding:0 clamp(16px,2.2vw,30px);
+  display:flex;flex-direction:column;align-items:center;
+  border-left:1px solid var(--ink);
+}
+.panel:first-child{border-left:0;padding-left:0}
+.panel:last-child{padding-right:0}
+.plabel{
+  align-self:flex-start;font-size:12px;letter-spacing:-.08em;line-height:1.2;
+  color:var(--fog);margin-bottom:12px;
+}
+.mini{display:block;width:100%;height:auto}
+.hook{display:block;width:46px;height:auto;margin:10px 0 8px}
+.panel figcaption{
+  width:100%;padding-top:12px;border-top:1px solid var(--ink);
+  font-style:italic;font-size:clamp(14px,1.15vw,16.5px);
+  letter-spacing:-.05em;line-height:1.32;
 }
 
 .introbar{
@@ -304,9 +299,12 @@ a{color:inherit}
 }
 #skip:hover{color:var(--ink)}
 
-@media (max-width:760px){
-  .diagram{display:none}
-  .steps{display:grid;gap:26px;max-width:340px;margin:0 auto}
+@media (max-width:880px){
+  .panels{grid-template-columns:1fr;max-width:360px;gap:0}
+  .panel{border-left:0;border-top:1px solid var(--ink);padding:24px 0 30px}
+  .panel:first-child{border-top:0;padding-top:0}
+  .panel:last-child{padding-bottom:0}
+  .plabel{margin-bottom:10px}
   .stage{overflow-y:auto;-webkit-overflow-scrolling:touch;align-content:start;padding-bottom:10px}
   .slide[data-s="0"],.slide[data-s="2"]{align-self:center;margin:auto 0}
 }
@@ -494,84 +492,10 @@ a{color:inherit}
     </section>
 
     <section class="slide" data-s="1">
-      <svg class="diagram" viewBox="105 46 1070 648" role="img"
-           aria-label="Diagram: a crosshair with references, resources, creative and technical on its arms; the Aha handle at the centre; a shelf of books; and paging arrows.">
-        <g stroke="#000" stroke-width="1" opacity=".38">
-          <line class="an dx" x1="520" y1="90" x2="520" y2="470"/>
-          <line class="an dy" x1="210" y1="300" x2="830" y2="300"/>
-        </g>
-        <g font-family="Inter Tight, sans-serif" font-size="25" letter-spacing="-.8" fill="#000">
-          <g class="an dx">
-            <text x="520" y="74" text-anchor="middle">references</text>
-            <text x="520" y="502" text-anchor="middle">resources</text>
-          </g>
-          <g class="an dy">
-            <text x="215" y="340">creative</text>
-            <text x="825" y="340" text-anchor="end">technical</text>
-          </g>
-        </g>
+      <div class="panels">
 
-        <g class="an dxy">
-          <circle cx="520" cy="300" r="72" fill="none" stroke="#000" stroke-width="1.5" opacity=".8"/>
-          <circle cx="520" cy="300" r="40" fill="#ffde3b" stroke="#000" stroke-width="1"/>
-          <text x="520" y="307" text-anchor="middle" font-family="Inter Tight, sans-serif"
-                font-style="italic" font-size="18" fill="#000">Aha!</text>
-        </g>
-
-        <circle cx="215" cy="155" r="82" fill="none" stroke="#000" stroke-width="1.5" opacity=".8"/>
-        <g stroke="#000" stroke-width="1" class="shelfA">
-          <rect class="an bk" x="168" y="155" width="13" height="30" fill="#c6dc3c"/>
-          <rect class="an bk" x="183" y="145" width="13" height="40" fill="#fbf8f5"/>
-          <rect class="an bk" x="198" y="133" width="13" height="52" fill="#ee84d5"/>
-          <rect class="an bk" x="213" y="139" width="13" height="46" fill="#c1f32b"/>
-          <rect class="an bk" x="228" y="149" width="13" height="36" fill="#6483ff"/>
-          <rect class="an bk" x="243" y="157" width="13" height="28" fill="#eadcce"/>
-        </g>
-
-        <circle cx="1015" cy="300" r="82" fill="none" stroke="#000" stroke-width="1.5" opacity=".8"/>
-        <g stroke="#000" stroke-width="1" class="shelfC">
-          <rect class="an tip" x="982" y="302" width="13" height="28" fill="#eadcce"/>
-          <rect class="an tip" x="997" y="292" width="13" height="38" fill="#c1f32b"/>
-          <rect class="an tip" x="1012" y="282" width="13" height="48" fill="#6483ff"/>
-          <rect class="an tip" x="1027" y="290" width="13" height="40" fill="#fbf8f5"/>
-          <rect class="an tip" x="1042" y="300" width="13" height="30" fill="#c6dc3c"/>
-        </g>
-        <g fill="#fff" stroke="#000" stroke-width="1">
-          <circle cx="957" cy="300" r="15"/><circle class="an ping" cx="1073" cy="300" r="15"/>
-        </g>
-        <g font-family="Inter, sans-serif" font-size="19" fill="#000" text-anchor="middle">
-          <text x="957" y="306">&#8249;</text><text x="1073" y="306">&#8250;</text>
-        </g>
-
-        <g fill="none" stroke="#000" stroke-width="2.2" stroke-linecap="round">
-          <path d="M168 236 C 146 292, 116 322, 110 368 C 105 404, 142 406, 147 374 C 152 342, 116 350, 111 388 C 103 442, 141 502, 170 550"/>
-          <path d="M588 258 C 648 186, 668 130, 706 112 C 736 98, 752 124, 726 136 C 700 148, 686 122, 706 106 C 752 70, 836 104, 882 144"/>
-          <path d="M1000 384 C 1002 442, 962 472, 918 498 C 896 512, 879 532, 873 554"/>
-        </g>
-        <g fill="none" stroke="#000" stroke-width="2" stroke-linejoin="round">
-          <path d="M0 0 L-17 -7 L-12 0 L-17 7 Z" transform="translate(170 550) rotate(59)"/>
-          <path d="M0 0 L-17 -7 L-12 0 L-17 7 Z" transform="translate(882 144) rotate(41)"/>
-          <path d="M0 0 L-17 -7 L-12 0 L-17 7 Z" transform="translate(873 554) rotate(105)"/>
-        </g>
-
-        <g font-family="Inter, sans-serif" font-style="italic" font-size="19.5" letter-spacing="-.85" fill="#000">
-          <text x="112" y="600">Aha is a library of design</text>
-          <text x="112" y="626">resources and references</text>
-          <text x="112" y="652">sorted to my (maker) idea of</text>
-          <text x="112" y="678">where each reference lies.</text>
-
-          <text x="902" y="112">Move aha in whatever direction</text>
-          <text x="902" y="138">you&#8217;re searching and then&#8230;</text>
-          <text x="902" y="164">go aha? Hopefully.</text>
-
-          <text x="762" y="606">The books will ruffle as you move</text>
-          <text x="762" y="632">the cursor, and you can use the</text>
-          <text x="762" y="658">arrows to see more in the same area.</text>
-        </g>
-      </svg>
-
-      <div class="steps">
-        <figure>
+        <figure class="panel">
+          <div class="plabel">the field</div>
           <svg class="mini" viewBox="0 0 320 200" role="img" aria-label="Books placed across the four quadrants of the field.">
             <g stroke="#000" stroke-width="1" opacity=".34">
               <line x1="160" y1="20" x2="160" y2="172"/><line x1="22" y1="96" x2="298" y2="96"/>
@@ -595,10 +519,12 @@ a{color:inherit}
               <rect class="an place" x="248" y="146" width="9" height="15" fill="#eadcce"/>
             </g>
           </svg>
+          <svg class="hook" viewBox="0 0 60 56" aria-hidden="true"><path d="M30 2 C 43 13, 41 24, 29 26 C 18 28, 18 17, 28 17 C 41 17, 35 35, 31 48" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round"/><path d="M0 0 L-13 -6 L-9 0 L-13 6 Z" transform="translate(31 50) rotate(96)" fill="none" stroke="#000" stroke-width="1.8" stroke-linejoin="round"/></svg>
           <figcaption>Aha is a library of design resources and references sorted to my (maker) idea of where each reference lies.</figcaption>
         </figure>
 
-        <figure>
+        <figure class="panel">
+          <div class="plabel">the handle</div>
           <svg class="mini" viewBox="0 0 320 200" role="img" aria-label="The Aha handle being dragged across the field, leaving a trail.">
             <g stroke="#000" stroke-width="1" opacity=".34">
               <line class="an tx" x1="206" y1="20" x2="206" y2="172"/>
@@ -621,10 +547,12 @@ a{color:inherit}
                     font-style="italic" font-size="11" fill="#000">Aha!</text>
             </g>
           </svg>
+          <svg class="hook" viewBox="0 0 60 56" aria-hidden="true"><path d="M30 2 C 43 13, 41 24, 29 26 C 18 28, 18 17, 28 17 C 41 17, 35 35, 31 48" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round"/><path d="M0 0 L-13 -6 L-9 0 L-13 6 Z" transform="translate(31 50) rotate(96)" fill="none" stroke="#000" stroke-width="1.8" stroke-linejoin="round"/></svg>
           <figcaption>Move aha in whatever direction you&rsquo;re searching and then&hellip; go aha? Hopefully.</figcaption>
         </figure>
 
-        <figure>
+        <figure class="panel">
+          <div class="plabel">the shelf</div>
           <svg class="mini" viewBox="0 0 320 200" role="img" aria-label="A shelf of books riffling, with arrows on either side to page through.">
             <line x1="46" y1="150" x2="274" y2="150" stroke="#000" stroke-width="1"/>
             <g stroke="#000" stroke-width=".9" class="mk3">
@@ -647,6 +575,7 @@ a{color:inherit}
               <text x="58" y="129">&#8249;</text><text x="262" y="129">&#8250;</text>
             </g>
           </svg>
+          <svg class="hook" viewBox="0 0 60 56" aria-hidden="true"><path d="M30 2 C 43 13, 41 24, 29 26 C 18 28, 18 17, 28 17 C 41 17, 35 35, 31 48" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round"/><path d="M0 0 L-13 -6 L-9 0 L-13 6 Z" transform="translate(31 50) rotate(96)" fill="none" stroke="#000" stroke-width="1.8" stroke-linejoin="round"/></svg>
           <figcaption>The books will ruffle as you move the cursor, and you can use the arrows to see more in the same area.</figcaption>
         </figure>
       </div>
