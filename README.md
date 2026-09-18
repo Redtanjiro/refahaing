@@ -13,7 +13,7 @@ the middle, so the skyline peaks over wherever you're pointing. The `‹ ›` ar
 deeper at the same coordinate and riffle the shelf. Click a spine and the book leaves
 the shelf, stands up, and opens flat.
 
-Live at **https://redtanjiro.github.io/aha/**
+Live at **https://refahaing.site**
 
 ---
 
@@ -50,11 +50,12 @@ them with two axis sliders. On a static host those are saved in your browser onl
 (`localStorage`), so they don't follow you between machines and they aren't shared
 with anyone else opening the site. Anything you want to keep belongs in `RAW`.
 
-## Structure
+## Rebuilding
 
-`index.html` is the whole thing — head, styles, markup, the library and the script.
-Edit it directly. `og.png` is the share card, `.nojekyll` tells GitHub Pages not to
-run Jekyll over the folder.
+`index.html` is generated from the Claude artifact source by `build.py` in the parent
+directory, which wraps the fragment in a full document and adds the head. If you're
+editing here directly, just edit `index.html` — the build script is only for pulling
+changes back down from the artifact.
 
 ## Design
 
