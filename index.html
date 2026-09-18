@@ -1,0 +1,1422 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Aha!</title>
+<meta name="description" content="A library of design references and resources plotted on two axes. Drag Aha! toward what you're after and the shelf restocks around it.">
+<meta name="author" content="Neel Parikh">
+<meta name="theme-color" content="#f1e8de">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14.5' fill='%23ffde3b' stroke='%23000' stroke-width='2'/></svg>">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Aha!">
+<meta property="og:description" content="A library of design references and resources plotted on two axes. Drag Aha! toward what you're after and the shelf restocks around it.">
+<meta property="og:image" content="og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;1,400&family=Inter+Tight:ital,wght@0,400;1,400&display=swap">
+<style>
+:root{color-scheme:light}
+body{margin:0;font:14px/1.2 system-ui,sans-serif}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+<style>
+/* ------------------------------------------------------------------
+   Streamtime applied to an instrument rather than a marketing page.
+   Warm linen canvas, black hairline structure, one sun-yellow action,
+   accent colours as paper stock, one charcoal band (the reading room).
+   Light-only by design — this system commits to one world.
+------------------------------------------------------------------- */
+:root{
+  --linen:#f1e8de;
+  --paper:#fbf8f5;
+  --white:#ffffff;
+  --charcoal:#2f2c29;
+  --ink:#000000;
+  --fog:#999999;
+  --stone:#c3b7ac;
+  --sand:#eadcce;
+  --yellow:#ffde3b;
+  --pink:#ff4dd5;
+  --lime:#c1f32b;
+  --peri:#6483ff;
+  --spring:#c6dc3c;
+  --bubble:#ee84d5;
+
+  --display:"Inter Tight","Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --standard:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+
+  --shadow-nav:rgba(0,0,0,.13) 1px 0 5px 0, rgba(0,0,0,.08) 2px 2px 4px 1px;
+  --shadow-float:rgba(115,115,115,.16) 0 3px 10px 0, rgba(115,115,115,.16) 0 2px 4px 0;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background:var(--linen);
+  color:var(--ink);
+  font-family:var(--standard);
+  font-weight:400;
+  overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+a{color:inherit}
+
+/* pills — the only round things in the system */
+.pill{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--standard);font-size:16px;letter-spacing:-.08em;line-height:1.2;
+  border-radius:96px;padding:8px 20px;
+  background:var(--white);border:1px solid var(--ink);color:var(--ink);
+  transition:background .16s ease;
+}
+.pill:hover{background:var(--sand)}
+.pill.action{
+  background:var(--yellow);border-color:var(--ink);
+  border-radius:160px;padding:14px 24px;
+}
+.pill.action:hover{background:#ffe870}
+.pill[disabled]{color:var(--fog);border-color:var(--fog);cursor:default;background:var(--white)}
+.tag{
+  display:inline-block;border-radius:5px;padding:5px 8px;
+  font-size:12px;letter-spacing:-.08em;line-height:1.1;
+  border:1px solid var(--ink);
+}
+
+/* ---------- the field ---------- */
+#field{position:fixed;inset:0;cursor:grab;touch-action:none;outline:none}
+#field.dragging{cursor:grabbing}
+#field:focus-visible{box-shadow:inset 0 0 0 2px var(--ink)}
+
+.rule{position:absolute;pointer-events:none;z-index:1}
+#vline{width:1px;top:0;bottom:0}
+#hline{height:1px;left:0;right:0}
+
+#knot{
+  position:absolute;z-index:4;
+  width:64px;height:64px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--ink);background:var(--yellow);
+  font-family:var(--display);font-style:italic;
+  font-size:20px;letter-spacing:-.034em;line-height:1;
+  transform:translate(-50%,-50%);pointer-events:none;
+}
+
+.axlabel{
+  position:absolute;z-index:1;
+  font-family:var(--display);font-weight:400;
+  letter-spacing:-.034em;line-height:1;
+  pointer-events:none;white-space:nowrap;color:var(--ink);
+}
+#lab-ref,#lab-res{transform:translateX(-50%)}
+#lab-cre{left:clamp(16px,3vw,40px)}
+#lab-tec{right:clamp(16px,3vw,40px)}
+
+/* ---------- shelf: paper stock, hairline cut ---------- */
+#shelf{position:absolute;pointer-events:none;z-index:2;perspective:820px;perspective-origin:50% 100%}
+.spine{
+  position:absolute;bottom:0;left:0;
+  transform-origin:bottom center;
+  pointer-events:auto;cursor:pointer;
+  will-change:transform,height;
+  transition:transform .42s cubic-bezier(.22,.9,.28,1),
+             height .42s cubic-bezier(.22,.9,.28,1),
+             width .42s cubic-bezier(.22,.9,.28,1),
+             opacity .3s ease;
+}
+.spine .body{
+  position:absolute;inset:0;
+  border:1px solid var(--ink);
+  border-radius:5px 5px 0 0;
+  overflow:hidden;
+  transition:transform .22s cubic-bezier(.22,.9,.28,1);
+}
+.spine:hover .body{transform:translateY(-8px)}
+.spine.sel .body{transform:translateY(-18px)}
+.spine.sel:hover .body{transform:translateY(-18px)}
+.spine:focus-visible{outline:none}
+.spine:focus-visible .body{transform:translateY(-8px);box-shadow:0 0 0 3px var(--yellow)}
+
+.ttl{
+  position:absolute;top:8px;left:0;right:0;bottom:30px;
+  writing-mode:vertical-rl;transform:rotate(180deg);
+  letter-spacing:-.05em;line-height:1;
+  display:flex;align-items:center;justify-content:flex-start;
+  overflow:hidden;white-space:nowrap;
+}
+.cn{
+  position:absolute;bottom:6px;left:0;right:0;height:20px;
+  writing-mode:vertical-rl;transform:rotate(180deg);
+  display:flex;align-items:center;justify-content:center;
+  font-size:8px;letter-spacing:-.02em;opacity:.72;
+  font-variant-numeric:tabular-nums;
+}
+.mine{
+  position:absolute;top:5px;left:50%;width:4px;height:4px;border-radius:50%;
+  transform:translateX(-50%);background:currentColor;
+}
+.spine::after{
+  content:attr(data-t);
+  position:absolute;bottom:calc(100% + 12px);left:50%;
+  transform:translateX(-50%) translateY(4px);
+  background:var(--ink);color:var(--paper);
+  font-size:12px;letter-spacing:-.06em;line-height:1.2;
+  padding:5px 9px;border-radius:5px;
+  white-space:nowrap;opacity:0;pointer-events:none;
+  transition:opacity .16s ease,transform .16s ease;
+}
+.spine:hover::after{opacity:1;transform:translateX(-50%) translateY(0)}
+.spine.sel::after{opacity:0}
+
+.pager{
+  position:absolute;z-index:3;
+  width:34px;height:34px;padding:0;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:96px;border:1px solid var(--ink);background:var(--white);
+  font-size:17px;line-height:1;
+  transform:translate(-50%,-50%);
+  transition:background .16s ease;
+}
+.pager:hover{background:var(--yellow)}
+.pager[disabled]{opacity:.28;cursor:default;background:var(--white)}
+
+/* ---------- the front door: three screens ---------- */
+#intro{
+  position:fixed;inset:0;z-index:30;
+  background:var(--linen);
+  display:flex;flex-direction:column;
+  transition:opacity .44s ease;
+}
+#intro.gone{opacity:0;pointer-events:none}
+.stage{
+  flex:1;display:grid;place-items:center;
+  padding:clamp(20px,4vw,48px) clamp(16px,4vw,48px) 0;
+  min-height:0;
+}
+.slide{
+  grid-area:1/1;width:100%;max-width:1180px;text-align:center;
+  opacity:0;pointer-events:none;transform:translateY(12px);
+  transition:opacity .4s ease, transform .44s cubic-bezier(.22,.9,.28,1);
+}
+.slide.on{opacity:1;pointer-events:auto;transform:none}
+
+.wordmark{
+  margin:0;font-family:var(--display);font-weight:400;font-style:italic;
+  font-size:clamp(64px,11.5vw,146px);letter-spacing:-.042em;line-height:.9;
+}
+.tagline{
+  margin:12px 0 0;font-family:var(--display);font-weight:400;
+  font-size:clamp(19px,2.4vw,30px);letter-spacing:-.034em;line-height:1.1;
+}
+.signoff{
+  margin:0;font-style:italic;
+  font-size:clamp(19px,2.3vw,28px);letter-spacing:-.05em;line-height:1.25;
+}
+
+.diagram{display:block;width:100%;height:auto;max-height:70vh;margin:0 auto}
+
+/* ---- the diagrams demonstrate the mechanism, on a loop ---- */
+.an{animation-play-state:paused}
+.slide.on .an{animation-play-state:running}
+
+/* dragging the handle: the axes go with it */
+@keyframes ahaX{0%,100%{transform:translateX(0)}26%{transform:translateX(-34px)}56%{transform:translateX(30px)}82%{transform:translateX(-13px)}}
+@keyframes ahaY{0%,100%{transform:translateY(0)}26%{transform:translateY(-19px)}56%{transform:translateY(15px)}82%{transform:translateY(22px)}}
+@keyframes ahaXY{0%,100%{transform:translate(0,0)}26%{transform:translate(-34px,-19px)}56%{transform:translate(30px,15px)}82%{transform:translate(-13px,22px)}}
+.dx{animation:ahaX 11s ease-in-out infinite}
+.dy{animation:ahaY 11s ease-in-out infinite}
+.dxy{animation:ahaXY 11s ease-in-out infinite}
+
+/* the shelf restocking under the crosshair */
+@keyframes restock{0%,100%{transform:scaleY(1)}32%{transform:scaleY(.48)}66%{transform:scaleY(1.32)}}
+.bk{transform-box:fill-box;transform-origin:50% 100%;animation:restock 5.5s ease-in-out infinite}
+.shelfA .bk:nth-child(2){animation-delay:.22s}
+.shelfA .bk:nth-child(3){animation-delay:.44s}
+.shelfA .bk:nth-child(4){animation-delay:.66s}
+.shelfA .bk:nth-child(5){animation-delay:.88s}
+.shelfA .bk:nth-child(6){animation-delay:1.1s}
+
+/* the riffle, running in the arrow's direction */
+@keyframes tipover{0%,40%,100%{transform:rotate(0)}13%{transform:rotate(-32deg)}26%{transform:rotate(0)}}
+.tip{transform-box:fill-box;transform-origin:50% 100%;animation:tipover 3.6s ease-in-out infinite}
+.shelfC .tip:nth-child(2),.mk3 .tip:nth-child(2){animation-delay:.1s}
+.shelfC .tip:nth-child(3),.mk3 .tip:nth-child(3){animation-delay:.2s}
+.shelfC .tip:nth-child(4),.mk3 .tip:nth-child(4){animation-delay:.3s}
+.shelfC .tip:nth-child(5),.mk3 .tip:nth-child(5){animation-delay:.4s}
+.mk3 .tip:nth-child(6){animation-delay:.5s}
+.mk3 .tip:nth-child(7){animation-delay:.6s}
+.mk3 .tip:nth-child(8){animation-delay:.7s}
+
+@keyframes ping{0%,24%,100%{fill:#fff}7%{fill:#ffde3b}}
+.ping{animation:ping 3.6s ease-in-out infinite}
+
+/* books being placed into the quadrants */
+@keyframes place{0%,4%{transform:scaleY(0)}14%{transform:scaleY(1)}88%{transform:scaleY(1)}97%,100%{transform:scaleY(0)}}
+.place{transform-box:fill-box;transform-origin:50% 100%;animation:place 6.4s ease-in-out infinite}
+.mk1 .place:nth-child(2){animation-delay:.16s}
+.mk1 .place:nth-child(3){animation-delay:.32s}
+.mk1 .place:nth-child(4){animation-delay:.48s}
+.mk1 .place:nth-child(5){animation-delay:.64s}
+.mk1 .place:nth-child(6){animation-delay:.8s}
+.mk1 .place:nth-child(7){animation-delay:.96s}
+.mk1 .place:nth-child(8){animation-delay:1.12s}
+.mk1 .place:nth-child(9){animation-delay:1.28s}
+.mk1 .place:nth-child(10){animation-delay:1.44s}
+
+/* the handle travelling out along the trail and back */
+@keyframes travelX{0%,6%{transform:translateX(-114px)}48%,60%{transform:translateX(0)}96%,100%{transform:translateX(-114px)}}
+@keyframes travelY{0%,6%{transform:translateY(76px)}48%,60%{transform:translateY(0)}96%,100%{transform:translateY(76px)}}
+@keyframes travelXY{0%,6%{transform:translate(-114px,76px)}48%,60%{transform:translate(0,0)}96%,100%{transform:translate(-114px,76px)}}
+.tx{animation:travelX 6s ease-in-out infinite}
+.ty{animation:travelY 6s ease-in-out infinite}
+.txy{animation:travelXY 6s ease-in-out infinite}
+.steps{display:none}
+.steps figure{margin:0;display:flex;flex-direction:column;align-items:center}
+.mini{display:block;width:100%;max-width:300px;height:auto}
+.steps figcaption{
+  margin-top:10px;padding-top:11px;border-top:1px solid var(--ink);
+  width:100%;max-width:300px;text-align:left;
+  font-style:italic;font-size:15px;letter-spacing:-.05em;line-height:1.3;
+}
+
+.introbar{
+  flex:none;display:flex;align-items:center;justify-content:center;gap:clamp(14px,2vw,22px);
+  padding:clamp(18px,3vw,34px) 16px clamp(22px,3.5vw,38px);
+}
+.dots{display:flex;gap:8px}
+.dots button{
+  width:10px;height:10px;padding:0;border-radius:50%;
+  border:1px solid var(--ink);background:transparent;
+  transition:background .16s ease;
+}
+.dots button[aria-current="true"]{background:var(--yellow)}
+#back[hidden]{visibility:hidden;display:inline-flex}
+#skip{
+  font-size:12px;letter-spacing:-.08em;color:var(--fog);
+  position:absolute;right:clamp(16px,3vw,40px);top:clamp(16px,2.4vw,28px);
+}
+#skip:hover{color:var(--ink)}
+
+@media (max-width:760px){
+  .diagram{display:none}
+  .steps{display:grid;gap:26px;max-width:340px;margin:0 auto}
+  .stage{overflow-y:auto;-webkit-overflow-scrolling:touch;align-content:start;padding-bottom:10px}
+  .slide[data-s="0"],.slide[data-s="2"]{align-self:center;margin:auto 0}
+}
+
+/* ---------- the reading room: the one charcoal band ---------- */
+#bookstage{
+  position:fixed;inset:0;z-index:20;display:none;
+  place-items:center;perspective:1500px;perspective-origin:50% 44%;
+}
+#bookstage.on{display:grid}
+#backdrop{
+  position:absolute;inset:0;background:var(--charcoal);
+  opacity:0;transition:opacity .34s ease;
+}
+#bookstage.lit #backdrop{opacity:.97}
+#bookflip{position:relative;z-index:1;transform-style:preserve-3d;will-change:transform}
+#book{position:relative;transform-style:preserve-3d}
+
+.band{
+  position:absolute;top:0;bottom:0;left:50%;
+  transform:translateX(-50%);
+  border:1px solid var(--ink);
+  border-radius:5px 5px 0 0;overflow:hidden;
+}
+.band .bt{
+  position:absolute;top:10px;left:0;right:0;bottom:28px;
+  writing-mode:vertical-rl;transform:rotate(180deg);
+  display:flex;align-items:center;justify-content:flex-start;
+  font-size:11px;letter-spacing:-.05em;overflow:hidden;white-space:nowrap;
+}
+.band .bc{
+  position:absolute;bottom:7px;left:0;right:0;height:18px;
+  writing-mode:vertical-rl;transform:rotate(180deg);
+  display:flex;align-items:center;justify-content:center;
+  font-size:8px;opacity:.72;font-variant-numeric:tabular-nums;
+}
+
+.page{
+  position:absolute;top:0;height:100%;
+  transform-style:preserve-3d;
+  transition:transform .6s cubic-bezier(.26,.86,.28,1);
+}
+.page.l{transform-origin:right center;transform:rotateY(90deg)}
+.page.r{transform-origin:left center;transform:rotateY(-90deg)}
+#book.lift .page.l{transform:rotateY(116deg)}
+#book.lift .page.r{transform:rotateY(-116deg)}
+#book.lift .page{transition-duration:.2s;transition-timing-function:cubic-bezier(.32,.78,.42,1)}
+#book.open .page.l,#book.open .page.r{transform:rotateY(0deg)}
+#book.open .page{transition-duration:.62s;transition-timing-function:cubic-bezier(.26,.86,.28,1)}
+#book.open .page.r{transition-delay:.05s}
+
+.face{
+  position:absolute;inset:0;
+  background:var(--paper);
+  border:1px solid var(--ink);
+  backface-visibility:hidden;overflow:hidden;
+  box-shadow:var(--shadow-float);
+}
+.page.l .face{border-radius:5px 0 0 5px}
+.page.r .face{border-radius:0 5px 5px 0}
+
+/* the board: flat stock, hairline rule, stamped title. No artwork. */
+.face.back{
+  transform:rotateY(180deg);
+  background:var(--board,var(--sand));
+  color:var(--boardink,var(--ink));
+}
+.face.back::after{
+  content:"";position:absolute;inset:14px;
+  border:1px solid currentColor;opacity:.34;
+}
+.stamped{
+  position:absolute;left:24px;right:24px;top:15%;
+  text-align:center;
+  font-family:var(--display);font-size:22px;letter-spacing:-.034em;line-height:1.1;
+}
+.stamped.foot{
+  top:auto;bottom:30px;font-family:var(--standard);
+  font-size:12px;letter-spacing:-.08em;opacity:.7;font-variant-numeric:tabular-nums;
+}
+
+.gut{position:absolute;top:0;bottom:0;width:44px;pointer-events:none}
+.page.l .gut{right:0;background:linear-gradient(to left,rgba(0,0,0,.10),rgba(0,0,0,0))}
+.page.r .gut{left:0;background:linear-gradient(to right,rgba(0,0,0,.10),rgba(0,0,0,0))}
+
+.leaf{
+  position:absolute;inset:0;
+  padding:clamp(18px,2.4vw,28px);
+  display:flex;flex-direction:column;align-items:flex-start;
+  opacity:0;transition:opacity .3s ease .28s;
+}
+#book.open .leaf{opacity:1}
+.page.l .leaf{padding-right:clamp(26px,3.2vw,40px)}
+.page.r .leaf{padding-left:clamp(26px,3.2vw,40px)}
+
+.label{font-size:12px;letter-spacing:-.08em;line-height:1.2;color:var(--fog)}
+#b-title{
+  margin:16px 0 0;font-family:var(--display);font-weight:400;
+  font-size:clamp(24px,2.9vw,38px);letter-spacing:-.034em;line-height:1;
+  text-wrap:balance;
+}
+.hair{height:1px;background:var(--ink);margin:16px 0;align-self:stretch}
+#b-note{
+  margin:0;font-size:clamp(15px,1.15vw,18px);letter-spacing:-.06em;line-height:1.28;
+}
+.spacer{flex:1;min-height:14px}
+#locator{display:block;width:100%;max-width:168px;height:auto;margin:14px 0 12px}
+#b-coord{font-size:16px;letter-spacing:-.08em;line-height:1.2;font-variant-numeric:tabular-nums}
+#b-near{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:2px;align-self:stretch}
+#b-near button{
+  display:flex;align-items:center;gap:9px;width:100%;text-align:left;
+  font-size:16px;letter-spacing:-.08em;line-height:1.2;
+  padding:5px 6px;margin-left:-6px;border-radius:5px;
+}
+#b-near button:hover{background:var(--sand)}
+#b-near .chip{width:9px;height:18px;flex:none;border-radius:5px;border:1px solid var(--ink)}
+#b-visit{margin-top:16px;text-decoration:none}
+
+#shut{position:fixed;top:clamp(16px,2.4vw,28px);right:clamp(16px,3vw,40px);z-index:22;display:none}
+#bookstage.on ~ #shut{display:inline-flex}
+
+/* ---------- shelving panel ---------- */
+#addwrap{position:fixed;z-index:6;right:clamp(16px,3vw,40px);bottom:clamp(16px,2.4vw,28px);display:none}
+#addwrap.on{display:block}
+#addpanel{
+  display:none;width:min(300px,calc(100vw - 32px));
+  background:var(--paper);border:1px solid var(--ink);border-radius:5px;
+  box-shadow:var(--shadow-nav);
+  padding:20px;margin-bottom:12px;
+}
+#addpanel.on{display:block}
+#addpanel label{
+  display:block;font-size:12px;letter-spacing:-.08em;line-height:1.2;color:var(--fog);
+  margin:14px 0 5px;
+}
+#addpanel label:first-of-type{margin-top:0}
+#addpanel input[type=text]{
+  width:100%;font-family:var(--standard);font-size:16px;letter-spacing:-.08em;
+  color:var(--ink);background:var(--white);
+  border:1px solid var(--ink);border-radius:5px;padding:8px 10px;
+}
+#addpanel input[type=text]:focus{outline:2px solid var(--yellow);outline-offset:1px}
+#addpanel input[type=range]{width:100%;accent-color:var(--ink);margin:4px 0 0}
+.slabs{
+  display:flex;justify-content:space-between;
+  font-size:12px;letter-spacing:-.08em;color:var(--fog);margin-top:2px;
+}
+#savebtn{margin-top:18px;width:100%;justify-content:center}
+#addnote{margin:10px 0 0;font-size:12px;letter-spacing:-.08em;line-height:1.2;color:var(--fog);min-height:1em}
+
+@media (max-width:640px){
+  #bookstage{perspective:1000px}
+  .axlabel{font-size:26px !important}
+  #knot{width:52px;height:52px;font-size:16px}
+  #b-title{font-size:22px}
+  .stamped{font-size:17px}
+}
+@media (prefers-reduced-motion: reduce){
+  .spine,.spine .body,.page,.leaf,#bookflip,.spine::after{transition:none !important}
+  .an{animation:none !important}
+}
+</style>
+</head>
+<body>
+<div id="field" tabindex="0" aria-label="Reference field. Drag or use arrow keys to move the axes.">
+  <div class="rule" id="vline"></div>
+  <div class="rule" id="hline"></div>
+  <span class="axlabel" id="lab-ref">references</span>
+  <span class="axlabel" id="lab-res">resources</span>
+  <span class="axlabel" id="lab-cre">creative</span>
+  <span class="axlabel" id="lab-tec">technical</span>
+  <div id="knot">Aha!</div>
+  <button class="pager" id="prev" aria-label="Previous shelf">&lsaquo;</button>
+  <button class="pager" id="next" aria-label="Next shelf">&rsaquo;</button>
+  <div id="shelf"></div>
+</div>
+
+<div id="intro">
+  <button id="skip">skip</button>
+
+  <div class="stage">
+    <section class="slide on" data-s="0">
+      <h1 class="wordmark">Aha!</h1>
+      <p class="tagline">Adding the aha to ref - aha - ing</p>
+    </section>
+
+    <section class="slide" data-s="1">
+      <svg class="diagram" viewBox="105 46 1070 648" role="img"
+           aria-label="Diagram: a crosshair with references, resources, creative and technical on its arms; the Aha handle at the centre; a shelf of books; and paging arrows.">
+        <g stroke="#000" stroke-width="1" opacity=".38">
+          <line class="an dx" x1="520" y1="90" x2="520" y2="470"/>
+          <line class="an dy" x1="210" y1="300" x2="830" y2="300"/>
+        </g>
+        <g font-family="Inter Tight, sans-serif" font-size="25" letter-spacing="-.8" fill="#000">
+          <g class="an dx">
+            <text x="520" y="74" text-anchor="middle">references</text>
+            <text x="520" y="502" text-anchor="middle">resources</text>
+          </g>
+          <g class="an dy">
+            <text x="215" y="340">creative</text>
+            <text x="825" y="340" text-anchor="end">technical</text>
+          </g>
+        </g>
+
+        <g class="an dxy">
+          <circle cx="520" cy="300" r="72" fill="none" stroke="#000" stroke-width="1.5" opacity=".8"/>
+          <circle cx="520" cy="300" r="40" fill="#ffde3b" stroke="#000" stroke-width="1"/>
+          <text x="520" y="307" text-anchor="middle" font-family="Inter Tight, sans-serif"
+                font-style="italic" font-size="18" fill="#000">Aha!</text>
+        </g>
+
+        <circle cx="215" cy="155" r="82" fill="none" stroke="#000" stroke-width="1.5" opacity=".8"/>
+        <g stroke="#000" stroke-width="1" class="shelfA">
+          <rect class="an bk" x="168" y="155" width="13" height="30" fill="#c6dc3c"/>
+          <rect class="an bk" x="183" y="145" width="13" height="40" fill="#fbf8f5"/>
+          <rect class="an bk" x="198" y="133" width="13" height="52" fill="#ee84d5"/>
+          <rect class="an bk" x="213" y="139" width="13" height="46" fill="#c1f32b"/>
+          <rect class="an bk" x="228" y="149" width="13" height="36" fill="#6483ff"/>
+          <rect class="an bk" x="243" y="157" width="13" height="28" fill="#eadcce"/>
+        </g>
+
+        <circle cx="1015" cy="300" r="82" fill="none" stroke="#000" stroke-width="1.5" opacity=".8"/>
+        <g stroke="#000" stroke-width="1" class="shelfC">
+          <rect class="an tip" x="982" y="302" width="13" height="28" fill="#eadcce"/>
+          <rect class="an tip" x="997" y="292" width="13" height="38" fill="#c1f32b"/>
+          <rect class="an tip" x="1012" y="282" width="13" height="48" fill="#6483ff"/>
+          <rect class="an tip" x="1027" y="290" width="13" height="40" fill="#fbf8f5"/>
+          <rect class="an tip" x="1042" y="300" width="13" height="30" fill="#c6dc3c"/>
+        </g>
+        <g fill="#fff" stroke="#000" stroke-width="1">
+          <circle cx="957" cy="300" r="15"/><circle class="an ping" cx="1073" cy="300" r="15"/>
+        </g>
+        <g font-family="Inter, sans-serif" font-size="19" fill="#000" text-anchor="middle">
+          <text x="957" y="306">&#8249;</text><text x="1073" y="306">&#8250;</text>
+        </g>
+
+        <g fill="none" stroke="#000" stroke-width="2.2" stroke-linecap="round">
+          <path d="M168 236 C 146 292, 116 322, 110 368 C 105 404, 142 406, 147 374 C 152 342, 116 350, 111 388 C 103 442, 141 502, 170 550"/>
+          <path d="M588 258 C 648 186, 668 130, 706 112 C 736 98, 752 124, 726 136 C 700 148, 686 122, 706 106 C 752 70, 836 104, 882 144"/>
+          <path d="M1000 384 C 1002 442, 962 472, 918 498 C 896 512, 879 532, 873 554"/>
+        </g>
+        <g fill="none" stroke="#000" stroke-width="2" stroke-linejoin="round">
+          <path d="M0 0 L-17 -7 L-12 0 L-17 7 Z" transform="translate(170 550) rotate(59)"/>
+          <path d="M0 0 L-17 -7 L-12 0 L-17 7 Z" transform="translate(882 144) rotate(41)"/>
+          <path d="M0 0 L-17 -7 L-12 0 L-17 7 Z" transform="translate(873 554) rotate(105)"/>
+        </g>
+
+        <g font-family="Inter, sans-serif" font-style="italic" font-size="19.5" letter-spacing="-.85" fill="#000">
+          <text x="112" y="600">Aha is a library of design</text>
+          <text x="112" y="626">resources and references</text>
+          <text x="112" y="652">sorted to my (maker) idea of</text>
+          <text x="112" y="678">where each reference lies.</text>
+
+          <text x="902" y="112">Move aha in whatever direction</text>
+          <text x="902" y="138">you&#8217;re searching and then&#8230;</text>
+          <text x="902" y="164">go aha? Hopefully.</text>
+
+          <text x="762" y="606">The books will ruffle as you move</text>
+          <text x="762" y="632">the cursor, and you can use the</text>
+          <text x="762" y="658">arrows to see more in the same area.</text>
+        </g>
+      </svg>
+
+      <div class="steps">
+        <figure>
+          <svg class="mini" viewBox="0 0 320 200" role="img" aria-label="Books placed across the four quadrants of the field.">
+            <g stroke="#000" stroke-width="1" opacity=".34">
+              <line x1="160" y1="20" x2="160" y2="172"/><line x1="22" y1="96" x2="298" y2="96"/>
+            </g>
+            <g font-family="Inter, sans-serif" font-size="9.5" fill="#999" letter-spacing="-.3">
+              <text x="160" y="14" text-anchor="middle">references</text>
+              <text x="160" y="188" text-anchor="middle">resources</text>
+              <text x="22" y="112">creative</text>
+              <text x="298" y="112" text-anchor="end">technical</text>
+            </g>
+            <g stroke="#000" stroke-width=".9" class="mk1">
+              <rect class="an place" x="52" y="40" width="9" height="24" fill="#ee84d5"/>
+              <rect class="an place" x="86" y="52" width="9" height="19" fill="#c6dc3c"/>
+              <rect class="an place" x="120" y="34" width="9" height="27" fill="#6483ff"/>
+              <rect class="an place" x="196" y="44" width="9" height="22" fill="#c3b7ac"/>
+              <rect class="an place" x="236" y="56" width="9" height="17" fill="#2f2c29"/>
+              <rect class="an place" x="266" y="38" width="9" height="25" fill="#ffffff"/>
+              <rect class="an place" x="64" y="132" width="9" height="20" fill="#eadcce"/>
+              <rect class="an place" x="104" y="142" width="9" height="16" fill="#c1f32b"/>
+              <rect class="an place" x="206" y="134" width="9" height="22" fill="#fbf8f5"/>
+              <rect class="an place" x="248" y="146" width="9" height="15" fill="#eadcce"/>
+            </g>
+          </svg>
+          <figcaption>Aha is a library of design resources and references sorted to my (maker) idea of where each reference lies.</figcaption>
+        </figure>
+
+        <figure>
+          <svg class="mini" viewBox="0 0 320 200" role="img" aria-label="The Aha handle being dragged across the field, leaving a trail.">
+            <g stroke="#000" stroke-width="1" opacity=".34">
+              <line class="an tx" x1="206" y1="20" x2="206" y2="172"/>
+              <line class="an ty" x1="22" y1="74" x2="298" y2="74"/>
+            </g>
+            <g font-family="Inter, sans-serif" font-size="9.5" fill="#999" letter-spacing="-.3">
+              <text class="an tx" x="206" y="14" text-anchor="middle">references</text>
+              <g class="an ty">
+                <text x="22" y="90">creative</text>
+                <text x="298" y="90" text-anchor="end">technical</text>
+              </g>
+            </g>
+            <path d="M92 150 C 118 140, 140 118, 160 100 C 176 86, 190 78, 202 74"
+                  fill="none" stroke="#000" stroke-width="1.6" stroke-dasharray="5 6" opacity=".55"/>
+            <circle cx="92" cy="150" r="17" fill="none" stroke="#000" stroke-width="1" opacity=".3"/>
+            <circle cx="140" cy="118" r="17" fill="none" stroke="#000" stroke-width="1" opacity=".5"/>
+            <g class="an txy">
+              <circle cx="206" cy="74" r="21" fill="#ffde3b" stroke="#000" stroke-width="1"/>
+              <text x="206" y="79" text-anchor="middle" font-family="Inter Tight, sans-serif"
+                    font-style="italic" font-size="11" fill="#000">Aha!</text>
+            </g>
+          </svg>
+          <figcaption>Move aha in whatever direction you&rsquo;re searching and then&hellip; go aha? Hopefully.</figcaption>
+        </figure>
+
+        <figure>
+          <svg class="mini" viewBox="0 0 320 200" role="img" aria-label="A shelf of books riffling, with arrows on either side to page through.">
+            <line x1="46" y1="150" x2="274" y2="150" stroke="#000" stroke-width="1"/>
+            <g stroke="#000" stroke-width=".9" class="mk3">
+              <rect class="an tip" x="96" y="112" width="12" height="38" fill="#eadcce"/>
+              <rect class="an tip" x="111" y="100" width="12" height="50" fill="#c1f32b"/>
+              <rect class="an tip" x="126" y="92" width="12" height="58" fill="#6483ff"/>
+              <rect class="an tip" x="141" y="98" width="12" height="52" fill="#fbf8f5"/>
+              <rect class="an tip" x="156" y="106" width="12" height="44" fill="#ee84d5"/>
+              <rect class="an tip" x="171" y="104" width="12" height="46" fill="#c6dc3c"/>
+              <rect class="an tip" x="186" y="114" width="12" height="36" fill="#c3b7ac"/>
+              <rect class="an tip" x="201" y="122" width="12" height="28" fill="#ffffff"/>
+            </g>
+            <g stroke="#000" stroke-width="1.4" opacity=".45" stroke-linecap="round">
+              <path d="M196 76 L206 68"/><path d="M212 84 L224 79"/><path d="M186 66 L192 56"/>
+            </g>
+            <g fill="#fff" stroke="#000" stroke-width="1">
+              <circle cx="58" cy="122" r="16"/><circle class="an ping" cx="262" cy="122" r="16"/>
+            </g>
+            <g font-family="Inter, sans-serif" font-size="19" fill="#000" text-anchor="middle">
+              <text x="58" y="129">&#8249;</text><text x="262" y="129">&#8250;</text>
+            </g>
+          </svg>
+          <figcaption>The books will ruffle as you move the cursor, and you can use the arrows to see more in the same area.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="slide" data-s="2">
+      <p class="signoff">and that&rsquo;s about ahall of it, hehe sorry last one.</p>
+    </section>
+  </div>
+
+  <nav class="introbar">
+    <button id="back" class="pill" hidden>back</button>
+    <div class="dots">
+      <button data-go="0" aria-label="Screen 1" aria-current="true"></button>
+      <button data-go="1" aria-label="Screen 2"></button>
+      <button data-go="2" aria-label="Screen 3"></button>
+    </div>
+    <button id="fwd" class="pill action">next</button>
+  </nav>
+</div>
+
+<div id="bookstage" aria-hidden="true">
+  <div id="backdrop"></div>
+  <div id="bookflip">
+    <div id="book">
+      <div class="page l">
+        <div class="face front">
+        <div class="leaf">
+          <span class="tag" id="b-kind">&nbsp;</span>
+          <h2 id="b-title">&nbsp;</h2>
+          <div class="hair"></div>
+          <p id="b-note">&nbsp;</p>
+          <div class="spacer"></div>
+          <span class="tag" id="b-stamp">&nbsp;</span>
+        </div>
+        <div class="gut"></div>
+        </div>
+        <div class="face back" id="cover-l"><span class="stamped" id="board-t"></span><span class="stamped foot" id="board-c"></span></div>
+      </div>
+      <div class="band" id="band"></div>
+      <div class="page r">
+        <div class="face front">
+        <div class="leaf">
+          <div class="label">where it sits</div>
+          <svg id="locator" viewBox="0 0 150 150" aria-hidden="true"></svg>
+          <div id="b-coord">&nbsp;</div>
+          <div class="hair"></div>
+          <div class="label">shelved beside</div>
+          <ul id="b-near"></ul>
+          <div class="spacer"></div>
+          <a id="b-visit" class="pill action" href="#" target="_blank" rel="noopener noreferrer">&nbsp;</a>
+        </div>
+        <div class="gut"></div>
+        </div>
+        <div class="face back" id="cover-r"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<button id="shut" class="pill">close</button>
+
+<div id="addwrap">
+  <div id="addpanel">
+    <label for="f-title">title</label>
+    <input type="text" id="f-title" placeholder="Fonts In Use" autocomplete="off">
+    <label for="f-url">url</label>
+    <input type="text" id="f-url" placeholder="fontsinuse.com" autocomplete="off">
+    <label for="f-kind">shelf label</label>
+    <input type="text" id="f-kind" placeholder="archive" autocomplete="off">
+    <label for="f-note">one line on why</label>
+    <input type="text" id="f-note" placeholder="Typography indexed by typeface and era." autocomplete="off">
+    <label for="f-x">where it sits, left to right</label>
+    <input type="range" id="f-x" min="-100" max="100" value="0">
+    <div class="slabs"><span>creative</span><span>technical</span></div>
+    <label for="f-y">where it sits, bottom to top</label>
+    <input type="range" id="f-y" min="-100" max="100" value="0">
+    <div class="slabs"><span>resources</span><span>references</span></div>
+    <button id="savebtn" class="pill action">shelve it</button>
+    <p id="addnote"></p>
+  </div>
+  <button id="addbtn" class="pill">+ shelve a book</button>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ------------------------------------------------------------------
+   The library. [title, url, kind, note, x, y]
+   x: -1 creative ............ +1 technical
+   y: -1 resources ........... +1 references
+------------------------------------------------------------------- */
+var RAW = [
+["Are.na","https://are.na","network","Slow, text-first visual research in channels people actually maintain.",-0.72,0.86],
+["Cosmos","https://cosmos.so","gallery","Visual bookmarking with a good eye. Strong on motion and 3D.",-0.68,0.78],
+["Savee","https://savee.it","gallery","Fashion-adjacent image board. Fast, heavily curated, very online.",-0.78,0.74],
+["Letterform Archive","https://letterformarchive.org","archive","Digitised type specimens, lettering and design ephemera.",-0.55,0.95],
+["The Public Domain Review","https://publicdomainreview.org","archive","Essays and scans from the stranger corners of the public domain.",-0.84,0.90],
+["Display","https://thisisdisplay.org","archive","Twentieth-century graphic design, catalogued properly.",-0.70,0.92],
+["Internet Archive","https://archive.org","archive","Scanned books, magazines and manuals. The deepest well there is.",-0.60,0.90],
+["Flickr Commons","https://www.flickr.com/commons","archive","Museum and library photography with no known copyright restrictions.",-0.75,0.88],
+["Fonts In Use","https://fontsinuse.com","index","Typography indexed by typeface, industry and era.",-0.30,0.82],
+["Brand New","https://www.underconsideration.com/brandnew/","review","Identity redesigns reviewed, with the old and new side by side.",-0.42,0.78],
+["Identity Designed","https://identitydesigned.com","case studies","Long-form identity work with the whole applied system shown.",-0.45,0.72],
+["siteInspire","https://www.siteinspire.com","gallery","Web design gallery, filterable by style, type and subject.",-0.28,0.74],
+["Typewolf","https://www.typewolf.com","index","What fonts a site is running, plus pairings that hold up.",-0.22,0.68],
+["Godly","https://godly.website","gallery","Astronomically good web design, mostly the art-directed end.",-0.35,0.68],
+["AIGA Eye on Design","https://eyeondesign.aiga.org","journal","Design writing that asks why, not just what.",-0.50,0.70],
+["It's Nice That","https://www.itsnicethat.com","journal","Daily coverage of illustration, graphic design and image-making.",-0.60,0.62],
+["Present & Correct","https://presentandcorrect.com","shop","Stationery and found ephemera as an ongoing colour education.",-0.88,0.55],
+["Awwwards","https://www.awwwards.com","gallery","Award-driven, but good for spotting technique trends early.",0.02,0.58],
+["Dribbble","https://dribbble.com","gallery","Shots, not systems. Useful for a quick visual temperature read.",-0.48,0.42],
+["Public Work","https://public.work","search","Fast search across a hundred thousand public domain images.",-0.70,-0.25],
+["Codrops","https://tympanus.net/codrops/","tutorial","Front-end demos and write-ups for effects you'd otherwise guess at.",0.30,0.40],
+["Coolors","https://coolors.co","tool","Palette generator quick enough to actually think in.",-0.32,-0.72],
+["Adobe Color","https://color.adobe.com","tool","Harmony rules and a contrast checker in the same place.",-0.25,-0.62],
+["Unsplash","https://unsplash.com","assets","Free photography. Watch for the house style creeping in.",-0.55,-0.58],
+["Pexels","https://www.pexels.com","assets","Free stock video, which is much harder to find than stock photos.",-0.50,-0.75],
+["Rawpixel","https://www.rawpixel.com","assets","Public domain art, vintage illustration and textures, cut out and ready.",-0.68,-0.66],
+["Texture Labs","https://texturelabs.org","assets","Free high-resolution paper, film, ink and light-leak textures.",-0.80,-0.78],
+["Open Peeps","https://www.openpeeps.com","assets","Hand-drawn illustration library built to be recombined.",-0.72,-0.72],
+["The Noun Project","https://thenounproject.com","assets","Icons for anything, including the concepts nobody else drew.",-0.35,-0.82],
+["Google Fonts","https://fonts.google.com","type","Free, self-hostable, and the variable axes stay underused.",-0.15,-0.72],
+["Fontshare","https://www.fontshare.com","type","Free, well-drawn faces from Indian Type Foundry.",-0.40,-0.70],
+["Velvetyne","https://velvetyne.fr","type","Libre type foundry with genuinely strange, excellent faces.",-0.78,-0.48],
+["Haikei","https://haikei.app","generator","Generates SVG blobs, waves, grain and gradients.",-0.30,-0.86],
+["Get Waves","https://getwaves.io","generator","One job: SVG wave dividers, done well.",-0.45,-0.92],
+["Figma Community","https://www.figma.com/community","library","Files, plugins and UI kits you can pull apart to learn from.",0.28,-0.68],
+["Spline","https://spline.design","tool","3D for the web without leaving a design-tool mental model.",0.30,-0.55],
+["Lucide","https://lucide.dev","assets","Consistent open-source icon set, properly maintained.",0.45,-0.84],
+["Phosphor Icons","https://phosphoricons.com","assets","Six weights of the same icon, which solves more than it sounds.",0.38,-0.80],
+["Type Scale","https://typescale.com","tool","Pick a ratio, see the whole scale, take the CSS.",0.22,-0.60],
+["v-fonts","https://v-fonts.com","index","Catalogue of variable fonts and the axes each one exposes.",0.18,-0.34],
+["Easings.net","https://easings.net","reference","Every named easing curve, previewed side by side.",0.50,-0.42],
+["cubic-bezier.com","https://cubic-bezier.com","tool","Drag the handles until the motion feels right, copy the value.",0.58,-0.90],
+["Utopia","https://utopia.fyi","tool","Fluid type and space scales that interpolate between breakpoints.",0.60,-0.44],
+["WebAIM Contrast","https://webaim.org/resources/contrastchecker/","tool","Ratio in, pass or fail out.",0.70,-0.55],
+["GSAP","https://gsap.com","library","The animation library when timing and sequencing actually matter.",0.62,-0.58],
+["Motion","https://motion.dev","library","Spring-based animation for React and vanilla JS.",0.66,-0.64],
+["Three.js","https://threejs.org","library","WebGL without writing WebGL. The examples page is the real doc.",0.80,-0.46],
+["Tailwind CSS","https://tailwindcss.com","framework","Utility CSS whose docs double as a spacing and colour scale reference.",0.78,-0.80],
+["Radix UI","https://www.radix-ui.com","library","Unstyled accessible primitives. The behaviour, none of the look.",0.86,-0.70],
+["shadcn/ui","https://ui.shadcn.com","library","Components you copy into your repo and then own outright.",0.80,-0.76],
+["Can I Use","https://caniuse.com","reference","Browser support, checked before you commit to the clever thing.",0.92,-0.60],
+["Refactoring UI","https://www.refactoringui.com","book","Design rules written for people who arrived from code.",0.48,0.50],
+["Mobbin","https://mobbin.com","library","Screenshots of real apps, organised by flow rather than by screen.",0.32,0.84],
+["Page Flows","https://pageflows.com","library","Recorded user flows, so you watch the whole journey end to end.",0.28,0.78],
+["Design Systems Repo","https://designsystemsrepo.com","index","Public design systems, indexed. Good for stealing structure.",0.58,0.78],
+["The Component Gallery","https://component.gallery","index","One component, compared across dozens of real systems.",0.72,0.80],
+["Laws of UX","https://lawsofux.com","reference","Cognitive principles, each with the study behind it attached.",0.55,0.72],
+["Nielsen Norman Group","https://www.nngroup.com","research","Usability research with the evidence still attached.",0.62,0.86],
+["Baymard Institute","https://baymard.com","research","Years of commerce UX testing, with the failure patterns named.",0.68,0.90],
+["Apple HIG","https://developer.apple.com/design/human-interface-guidelines/","guidelines","Still the clearest writing anywhere on platform convention.",0.70,0.66],
+["Material Design 3","https://m3.material.io","guidelines","A full system documented end to end, tokens included.",0.76,0.60],
+["Shopify Polaris","https://polaris.shopify.com","guidelines","A production design system with its reasoning written down.",0.66,0.54],
+["Inclusive Components","https://inclusive-components.design","reference","How to build the common components so they work for everyone.",0.82,0.72],
+["ARIA Authoring Practices","https://www.w3.org/WAI/ARIA/apg/","spec","Keyboard and semantics patterns, straight from the source.",0.90,0.78]
+];
+
+function mk(r,i,mine){
+  return {id:(mine?"u":"b")+i, t:r[0], url:r[1], kind:r[2], note:r[3], x:r[4], y:r[5], mine:!!mine};
+}
+var BASE = RAW.map(function(r,i){return mk(r,i,false);});
+var EXTRA = [];
+var BOOKS = BASE.slice();
+
+/* call number: quadrant code + scaled coordinates, library style */
+function callNo(b){
+  var q = (b.y>=0 ? "R" : "S") + (b.x>=0 ? "T" : "C");
+  var a = Math.round(Math.abs(b.x)*100), c = Math.round(Math.abs(b.y)*100);
+  return q + " " + (a<10?"0":"") + a + "." + (c<10?"0":"") + c;
+}
+/* Paper stock by book type. Colour no longer encodes position — the
+   crosshair does that. It says what KIND of thing you are holding. */
+var TYPE_OF = {
+  archive:"archive", search:"archive",
+  gallery:"monograph", network:"monograph", shop:"monograph",
+  index:"catalogue", review:"catalogue",
+  journal:"journal", "case studies":"journal", book:"journal",
+  tool:"manual", generator:"manual",
+  assets:"sample", type:"sample",
+  library:"technical", framework:"technical",
+  reference:"handbook", tutorial:"handbook",
+  research:"report",
+  guidelines:"standard", spec:"standard"
+};
+/* Stock is assigned by how common the type is: the eleven sample books
+   and nine manuals get quiet neutrals, the rarest types get the loud
+   accents. A saturated spine therefore means "this one is unusual",
+   and Sun Yellow appears twice in sixty-four, so it keeps its authority. */
+var STOCK = {
+  sample:   {fill:"#eadcce", ink:"#000000", name:"sample book"},      /* 11 */
+  manual:   {fill:"#fbf8f5", ink:"#000000", name:"manual"},           /*  9 */
+  technical:{fill:"#c3b7ac", ink:"#000000", name:"technical volume"}, /*  9 */
+  monograph:{fill:"#c6dc3c", ink:"#000000", name:"monograph"},        /*  8 */
+  archive:  {fill:"#ee84d5", ink:"#000000", name:"archive"},          /*  6 */
+  catalogue:{fill:"#6483ff", ink:"#ffffff", name:"catalogue"},        /*  6 */
+  handbook: {fill:"#c1f32b", ink:"#000000", name:"handbook"},         /*  5 */
+  journal:  {fill:"#ffffff", ink:"#000000", name:"journal"},          /*  4 */
+  standard: {fill:"#2f2c29", ink:"#fbf8f5", name:"standard"},         /*  4 */
+  report:   {fill:"#ffde3b", ink:"#000000", name:"report"}            /*  2 */
+};
+function stockOf(b){ return STOCK[TYPE_OF[b.kind] || "journal"]; }
+
+/* ------------------------------------------------------------------ */
+var field = document.getElementById("field");
+var shelf = document.getElementById("shelf");
+var vline = document.getElementById("vline");
+var hline = document.getElementById("hline");
+var knot  = document.getElementById("knot");
+var labRef=document.getElementById("lab-ref"), labRes=document.getElementById("lab-res");
+var labCre=document.getElementById("lab-cre"), labTec=document.getElementById("lab-tec");
+var prevB = document.getElementById("prev"), nextB = document.getElementById("next");
+var stage=document.getElementById("bookstage");
+var flip=document.getElementById("bookflip");
+var book=document.getElementById("book");
+var band=document.getElementById("band");
+var pageL=book.querySelector(".page.l"), pageR=book.querySelector(".page.r");
+var shut=document.getElementById("shut");
+
+var qx=-0.30, qy=0.50, page=0, selId=null, firstPaint=true, flutter=0;
+var G = {};          /* geometry for the current frame */
+var els = {};        /* id -> spine element */
+
+/* restore a shared coordinate from the hash */
+(function(){
+  var m = /^#(-?[\d.]+),(-?[\d.]+)$/.exec(location.hash||"");
+  if(m){ qx = clamp(parseFloat(m[1]),-1,1); qy = clamp(parseFloat(m[2]),-1,1); }
+})();
+
+function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+
+function geom(){
+  var W = window.innerWidth, H = window.innerHeight;
+  var n = clamp(Math.floor(W/88), 4, 11);
+  var half = (n*54 + (n-1)*3)/2;
+  var padX = half + 26;
+  var minX = Math.max(padX, W*0.13), maxX = Math.min(W-padX, W*0.87);
+  if(minX > maxX){ minX = maxX = W/2; }
+  var minY = H*0.40, maxY = H*0.74;
+  var labFS = clamp(W*0.046, 26, 68);
+  var labTop = W < 640 ? 42 : 54;
+  var maxH = Math.max(64, Math.min(clamp(H*0.20, 78, 190), minY - (labTop + labFS*1.05 + 18)));
+  return {W:W,H:H,n:n,maxH:maxH,minH:maxH*0.54,minX:minX,maxX:maxX,
+          minY:minY,maxY:maxY,labFS:labFS,labTop:labTop};
+}
+function ox(){ return G.minX + (qx+1)/2*(G.maxX-G.minX); }
+function oy(){ return G.minY + (1-qy)/2*(G.maxY-G.minY); }
+
+function sgn(v){ return (v<0?"−":"+") + Math.abs(v).toFixed(2); }
+
+/* ------------------------------------------------------------------ */
+function rank(){
+  var scored = BOOKS.map(function(b){
+    var dx=b.x-qx, dy=b.y-qy;
+    return {b:b, d:Math.sqrt(dx*dx+dy*dy)};
+  });
+  scored.sort(function(a,b){ return a.d-b.d || (a.b.t<b.b.t?-1:1); });
+  return scored;
+}
+
+function render(){
+  G = geom();
+  var X = ox(), Y = oy();
+
+  vline.style.left = X+"px";
+  hline.style.top  = Y+"px";
+
+  /* The rules dissolve at their ends rather than running to the edge,
+     and the vertical one clears out entirely where the words sit. */
+  var pv = function(px){ return (px / G.H * 100).toFixed(2) + "%"; };
+  var topClear = G.labTop + G.labFS + 22;
+  var botClear = 30 + G.labFS + 22;
+  var fade = Math.min(120, Math.max(40, (G.H - topClear - botClear) * 0.22));
+  var a = topClear, b = topClear + fade;
+  var d = G.H - botClear, c = d - fade;
+  if(b > c){ b = c = (b + c) / 2; }
+  vline.style.background =
+    "linear-gradient(to bottom,rgba(0,0,0,0) " + pv(a) + ",#000 " + pv(b) +
+    ",#000 " + pv(c) + ",rgba(0,0,0,0) " + pv(d) + ")";
+  hline.style.background =
+    "linear-gradient(to right,rgba(0,0,0,0) 2%,#000 17%,#000 83%,rgba(0,0,0,0) 98%)";
+  knot.style.left  = X+"px";
+  knot.style.top   = Y+"px";
+
+  [labRef,labRes,labCre,labTec].forEach(function(el){ el.style.fontSize = Math.round(G.labFS)+"px"; });
+  labRef.style.left = X+"px"; labRef.style.top = G.labTop+"px";
+  labRes.style.left = X+"px"; labRes.style.bottom = "30px";
+  labCre.style.top  = (Y+14)+"px";
+  labTec.style.top  = (Y+14)+"px";
+
+  var scored = rank();
+  var total = scored.length;
+  var maxPage = Math.max(0, Math.ceil(total/G.n)-1);
+  if(page > maxPage) page = maxPage;
+  var slice = scored.slice(page*G.n, page*G.n + G.n);
+  if(!slice.length){ page = 0; slice = scored.slice(0, G.n); }
+
+  var dmin = slice[0].d, dmax = slice[slice.length-1].d;
+  var span = (dmax-dmin) || 1;
+
+  /* best match in the middle, next best fanning out both ways */
+  var arranged = [];
+  slice.forEach(function(s,i){ if(i%2===0) arranged.push(s); else arranged.unshift(s); });
+
+  var widths = arranged.map(function(s){
+    return Math.round(clamp(25 + s.b.t.length*1.45, 27, 54));
+  });
+  var gap = 3;
+  var totalW = widths.reduce(function(a,b){return a+b;},0) + gap*(widths.length-1);
+
+  shelf.style.left = Math.round(X - totalW/2)+"px";
+  shelf.style.top  = Math.round(Y - G.maxH)+"px";
+  shelf.style.width = totalW+"px";
+  shelf.style.height = G.maxH+"px";
+
+  prevB.style.left = Math.round(X - totalW/2 - 26)+"px";
+  prevB.style.top  = Math.round(Y - G.maxH*0.55)+"px";
+  nextB.style.left = Math.round(X + totalW/2 + 26)+"px";
+  nextB.style.top  = Math.round(Y - G.maxH*0.55)+"px";
+  prevB.disabled = page===0;
+  nextB.disabled = page===maxPage;
+
+  var keep = {}, cursor = 0;
+  arranged.forEach(function(s,i){
+    var b = s.b;
+    keep[b.id] = true;
+    var el = els[b.id], fresh = false;
+    if(!el){
+      fresh = true;
+      el = document.createElement("button");
+      el.className = "spine";
+      el.setAttribute("data-t", b.t);
+      el.setAttribute("aria-label", b.t + ". " + b.kind + ".");
+      var st = stockOf(b);
+      el.innerHTML = '<span class="body" style="background:'+st.fill+';color:'+st.ink+
+        '"><span class="ttl"></span>' +
+        '<span class="cn">'+callNo(b)+'</span>'+(b.mine?'<span class="mine"></span>':'')+'</span>';
+      el._ttl = el.querySelector(".ttl");
+      el.addEventListener("click", function(ev){ ev.stopPropagation(); pick(b.id); });
+      shelf.appendChild(el);
+      els[b.id] = el;
+    }
+    var t = 1 - (s.d - dmin)/span;
+    var h = Math.round(G.minH + (G.maxH-G.minH)*t);
+    var x = cursor;
+    cursor += widths[i] + gap;
+
+    el.style.width = widths[i]+"px";
+    el.style.height = h+"px";
+
+    var avail = h - 46;
+    var fs = clamp(avail/(b.t.length*0.60), 8.5, 12.5);
+    var room = Math.floor(avail/(fs*0.60));
+    el._ttl.style.fontSize = fs.toFixed(1)+"px";
+    el._ttl.textContent = b.t.length > room ? b.t.slice(0, Math.max(1, room-1)) + "…" : b.t;
+    el.classList.toggle("sel", selId===b.id);
+
+    el._x = x;
+    /* paging riffles the shelf: the wave runs in the arrow's direction */
+    var wave = flutter ? (flutter > 0 ? i : (arranged.length-1-i)) * 24 : 0;
+
+    if(fresh){
+      el.style.opacity = "0";
+      el.style.transform = flutter
+        ? "translateX("+x+"px) rotateX(-86deg) scaleY(1)"
+        : "translateX("+x+"px) rotateX(0deg) scaleY(0)";
+      var lead = firstPaint ? i*26 : wave;
+      if(lead) el.style.transitionDelay = lead+"ms";
+      requestAnimationFrame(function(){ requestAnimationFrame(function(){
+        el.style.opacity = "1";
+        el.style.transform = "translateX("+x+"px) rotateX(0deg) scaleY(1)";
+        setTimeout(function(){ el.style.transitionDelay = ""; }, 700 + lead);
+      });});
+    } else {
+      el.style.transitionDelay = wave ? wave+"ms" : "";
+      el.style.opacity = "1";
+      el.style.transform = "translateX("+x+"px) rotateX(0deg) scaleY(1)";
+      if(wave) setTimeout(function(){ el.style.transitionDelay = ""; }, 700 + wave);
+    }
+  });
+  firstPaint = false;
+
+  var going = Object.keys(els).filter(function(id){ return !keep[id]; })
+    .map(function(id){ return {id:id, el:els[id], x:els[id]._x || 0}; })
+    .sort(function(m,n){ return flutter < 0 ? n.x - m.x : m.x - n.x; });
+
+  going.forEach(function(g, i){
+    delete els[g.id];
+    var el = g.el, wave = flutter ? i*24 : 0;
+    el.style.pointerEvents = "none";
+    if(wave) el.style.transitionDelay = wave+"ms";
+    el.style.opacity = "0";
+    el.style.transform = flutter
+      ? "translateX("+g.x+"px) rotateX(78deg) scaleY(1)"
+      : "translateX("+g.x+"px) rotateX(0deg) scaleY(0)";
+    setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); }, 520 + wave);
+  });
+  flutter = 0;
+
+}
+
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]; }); }
+
+/* ------------------------------------------------------------------
+   Opening a book. The spine leaves the shelf, stands up in the middle,
+   and the two leaves swing open off it until the spread lies flat.
+------------------------------------------------------------------- */
+var openB = null, srcRect = null, srcEl = null, busy = 0;
+
+function byId(id){
+  for(var i=0;i<BOOKS.length;i++){ if(BOOKS[i].id===id) return BOOKS[i];
+  } return null;
+}
+
+function bookGeom(){
+  var W = window.innerWidth, H = window.innerHeight;
+  var bw = W < 560 ? 18 : 24;
+  var pw = clamp((W - 56 - bw)/2, 132, 340);
+  var ph = clamp(Math.min(H*0.70, pw*1.30), 250, 500);
+  return {bw:bw, pw:pw, ph:ph};
+}
+
+function fillBook(b){
+  var st = stockOf(b);
+  band.style.background = st.fill;
+  band.style.color = st.ink;
+  band.innerHTML = '<span class="bt"></span><span class="bc">'+callNo(b)+'</span>';
+  band.querySelector(".bt").textContent = b.t;
+
+  [document.getElementById("cover-l"), document.getElementById("cover-r")].forEach(function(el){
+    el.style.setProperty("--board", st.fill);
+    el.style.setProperty("--boardink", st.ink);
+  });
+  document.getElementById("board-t").textContent = b.t;
+  document.getElementById("board-c").textContent = callNo(b);
+
+  document.getElementById("b-kind").textContent = st.name;
+  document.getElementById("b-kind").style.background = st.fill;
+  document.getElementById("b-kind").style.color = st.ink;
+  document.getElementById("b-title").textContent = b.t;
+  document.getElementById("b-note").textContent = b.note;
+  document.getElementById("b-stamp").textContent = callNo(b);
+  document.getElementById("b-stamp").style.background = "#c3b7ac";
+  document.getElementById("b-coord").textContent = "x " + sgn(b.x) + "  \u00B7  y " + sgn(b.y);
+
+  var a = document.getElementById("b-visit");
+  if(b.url && b.url !== "#"){
+    a.href = b.url;
+    a.textContent = b.url.replace(/^https?:\/\//,"").replace(/^www\./,"").replace(/\/$/,"") + " \u2197";
+    a.style.display = "";
+  } else { a.style.display = "none"; }
+
+  /* the locator: this book's place in the same four quadrants */
+  var px = 16 + (b.x+1)/2*118, py = 16 + (1-b.y)/2*118;
+  document.getElementById("locator").innerHTML =
+    '<rect x="4" y="4" width="142" height="142" fill="none" stroke="#000" stroke-width="1" opacity=".3"/>' +
+    '<line x1="75" y1="4" x2="75" y2="146" stroke="#000" stroke-width="1" opacity=".55"/>' +
+    '<line x1="4" y1="75" x2="146" y2="75" stroke="#000" stroke-width="1" opacity=".55"/>' +
+    '<g fill="#2f2c29" opacity=".6" font-family="Inter, sans-serif" font-size="10" letter-spacing="-.03em">' +
+      '<text x="79" y="15">ref</text><text x="79" y="143">res</text>' +
+      '<text x="8" y="71">cre</text><text x="142" y="71" text-anchor="end">tec</text>' +
+    '</g>' +
+    '<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="11" fill="none" stroke="#000" stroke-width="1" opacity=".45"/>' +
+    '<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="5.5" fill="'+st.fill+'" stroke="#000" stroke-width="1"/>';
+
+  /* nearest neighbours in the space */
+  var near = BOOKS.filter(function(o){ return o.id !== b.id; }).map(function(o){
+    var dx=o.x-b.x, dy=o.y-b.y; return {o:o, d:Math.sqrt(dx*dx+dy*dy)};
+  }).sort(function(m,n){ return m.d-n.d; }).slice(0,3);
+
+  var ul = document.getElementById("b-near");
+  ul.innerHTML = "";
+  near.forEach(function(nb){
+    var cc = stockOf(nb.o);
+    var li = document.createElement("li");
+    var btn = document.createElement("button");
+    btn.innerHTML = '<span class="chip" style="background:'+cc.fill+'"></span>';
+    btn.appendChild(document.createTextNode(nb.o.t));
+    btn.addEventListener("click", function(e){ e.stopPropagation(); turnTo(nb.o); });
+    li.appendChild(btn);
+    ul.appendChild(li);
+  });
+}
+
+function layoutBook(){
+  var g = bookGeom();
+  book.style.width = (g.pw*2 + g.bw)+"px";
+  book.style.height = g.ph+"px";
+  band.style.width = g.bw+"px";
+  pageL.style.width = g.pw+"px";
+  pageR.style.width = g.pw+"px";
+  pageL.style.right = "calc(50% + "+(g.bw/2)+"px)";
+  pageR.style.left  = "calc(50% + "+(g.bw/2)+"px)";
+}
+
+function pick(id){
+  var b = byId(id);
+  if(!b || busy) return;
+  openB = b; selId = id;
+
+  srcEl = els[id] || null;
+  var body = srcEl && srcEl.querySelector(".body");
+  srcRect = body ? body.getBoundingClientRect() : null;
+
+  fillBook(b);
+  layoutBook();
+  stage.classList.add("on");
+  stage.setAttribute("aria-hidden","false");
+  if(srcEl) srcEl.style.visibility = "hidden";
+
+  /* match the band to the spine that was clicked, then release it */
+  flip.style.transition = "none";
+  flip.style.transform = "none";
+  var to = band.getBoundingClientRect();
+  if(srcRect && to.width && to.height){
+    var sxr = srcRect.width/to.width, syr = srcRect.height/to.height;
+    var tx = (srcRect.left+srcRect.width/2) - (to.left+to.width/2);
+    var ty = (srcRect.top+srcRect.height/2) - (to.top+to.height/2);
+    flip.style.transform = "translate("+tx.toFixed(1)+"px,"+ty.toFixed(1)+"px) scale("+sxr.toFixed(4)+","+syr.toFixed(4)+")";
+  }
+  void flip.offsetWidth;
+  requestAnimationFrame(function(){
+    stage.classList.add("lit");
+    flip.style.transition = "transform .48s cubic-bezier(.3,.9,.28,1)";
+    flip.style.transform = "translate(0px,0px) scale(1,1)";
+  });
+  busy = 1;
+  setTimeout(function(){ book.classList.add("lift"); }, 150);
+  setTimeout(function(){ book.classList.add("open"); busy = 0; }, 320);
+  render();
+}
+
+function turnTo(b){
+  if(busy) return;
+  busy = 1;
+  book.classList.remove("open");
+  setTimeout(function(){
+    openB = b; selId = b.id;
+    fillBook(b);
+    book.classList.add("open");
+    busy = 0;
+  }, 240);
+}
+
+function unpick(){
+  if(!stage.classList.contains("on") || busy) return;
+  busy = 1;
+  book.classList.remove("open");
+  stage.classList.remove("lit");
+  setTimeout(function(){ book.classList.remove("lift"); }, 300);
+  setTimeout(function(){
+    if(srcRect){
+      var to = band.getBoundingClientRect();
+      /* the band is back at its resting size once the flip resets, so
+         recompute against the identity box */
+      flip.style.transition = "none";
+      flip.style.transform = "none";
+      var id0 = band.getBoundingClientRect();
+      var sxr = srcRect.width/id0.width, syr = srcRect.height/id0.height;
+      var tx = (srcRect.left+srcRect.width/2) - (id0.left+id0.width/2);
+      var ty = (srcRect.top+srcRect.height/2) - (id0.top+id0.height/2);
+      void flip.offsetWidth;
+      flip.style.transition = "transform .38s cubic-bezier(.4,0,.5,1)";
+      flip.style.transform = "translate("+tx.toFixed(1)+"px,"+ty.toFixed(1)+"px) scale("+sxr.toFixed(4)+","+syr.toFixed(4)+")";
+    }
+    setTimeout(finishClose, srcRect ? 380 : 0);
+  }, 470);
+}
+function finishClose(){
+  stage.classList.remove("on");
+  book.classList.remove("lift");
+  stage.setAttribute("aria-hidden","true");
+  flip.style.transition = "none";
+  flip.style.transform = "none";
+  if(srcEl) srcEl.style.visibility = "";
+  srcEl = null; srcRect = null; openB = null; selId = null;
+  busy = 0;
+  render();
+}
+
+shut.addEventListener("click", function(e){ e.stopPropagation(); unpick(); });
+document.getElementById("backdrop").addEventListener("click", function(e){ e.stopPropagation(); unpick(); });
+document.addEventListener("keydown", function(e){
+  if(e.key === "Escape" && stage.classList.contains("on")){ e.preventDefault(); unpick(); }
+});
+window.addEventListener("resize", function(){ if(stage.classList.contains("on")) layoutBook(); });
+
+/* ------------------------------------------------------------------ */
+var dragging = false, lastX = 0, lastY = 0, moved = 0, raf = 0;
+
+function schedule(){
+  if(raf) return;
+  raf = requestAnimationFrame(function(){ raf = 0; render(); });
+}
+function hashSync(){
+  try{ history.replaceState(null, "", "#" + qx.toFixed(2) + "," + qy.toFixed(2)); }catch(e){}
+}
+
+field.addEventListener("pointerdown", function(e){
+  if(e.target.closest(".spine, .pager")) return;
+  dragging = true; moved = 0;
+  lastX = e.clientX; lastY = e.clientY;
+  field.classList.add("dragging");
+  field.setPointerCapture(e.pointerId);
+});
+field.addEventListener("pointermove", function(e){
+  if(!dragging) return;
+  var dx = e.clientX - lastX, dy = e.clientY - lastY;
+  lastX = e.clientX; lastY = e.clientY;
+  moved += Math.abs(dx) + Math.abs(dy);
+  var rx = (G.maxX - G.minX) || 1, ry = (G.maxY - G.minY) || 1;
+  qx = clamp(qx + dx/rx*2, -1, 1);
+  qy = clamp(qy - dy/ry*2, -1, 1);
+  schedule();
+});
+function endDrag(e){
+  if(!dragging) return;
+  dragging = false;
+  field.classList.remove("dragging");
+  try{ field.releasePointerCapture(e.pointerId); }catch(err){}
+  if(moved < 4 && selId) unpick();
+  hashSync();
+}
+field.addEventListener("pointerup", endDrag);
+field.addEventListener("pointercancel", endDrag);
+
+field.addEventListener("keydown", function(e){
+  var step = e.shiftKey ? 0.01 : 0.05, hit = true;
+  if(e.key==="ArrowLeft") qx = clamp(qx-step,-1,1);
+  else if(e.key==="ArrowRight") qx = clamp(qx+step,-1,1);
+  else if(e.key==="ArrowUp") qy = clamp(qy+step,-1,1);
+  else if(e.key==="ArrowDown") qy = clamp(qy-step,-1,1);
+  else if(e.key==="Escape"){ if(selId) unpick(); hit = true; }
+  else hit = false;
+  if(hit){ e.preventDefault(); schedule(); hashSync(); }
+});
+
+prevB.addEventListener("click", function(e){ e.stopPropagation(); if(page>0){ page--; flutter = -1; render(); } });
+nextB.addEventListener("click", function(e){ e.stopPropagation(); page++; flutter = 1; render(); });
+window.addEventListener("resize", function(){ schedule(); });
+
+render();
+
+/* three screens, then the field */
+(function(){
+  var intro = document.getElementById("intro");
+  var slides = [].slice.call(intro.querySelectorAll(".slide"));
+  var dots = [].slice.call(intro.querySelectorAll(".dots button"));
+  var back = document.getElementById("back"), fwd = document.getElementById("fwd");
+  var at = 0, left = true;
+
+  function show(i){
+    at = Math.max(0, Math.min(slides.length-1, i));
+    slides.forEach(function(el,n){ el.classList.toggle("on", n===at); });
+    dots.forEach(function(el,n){ el.setAttribute("aria-current", n===at ? "true" : "false"); });
+    back.hidden = at === 0;
+    fwd.textContent = at === slides.length-1 ? "go aha" : "next";
+  }
+  function enter(){
+    if(!left) return;
+    left = false;
+    intro.classList.add("gone");
+    setTimeout(function(){ intro.style.display = "none"; field.focus({preventScroll:true}); }, 480);
+  }
+
+  fwd.addEventListener("click", function(){ at === slides.length-1 ? enter() : show(at+1); });
+  back.addEventListener("click", function(){ show(at-1); });
+  dots.forEach(function(el){ el.addEventListener("click", function(){ show(+el.getAttribute("data-go")); }); });
+  document.getElementById("skip").addEventListener("click", enter);
+  document.addEventListener("keydown", function(e){
+    if(!left) return;
+    if(e.key === "Escape"){ enter(); }
+    else if(e.key === "ArrowRight" || e.key === "Enter"){ e.preventDefault(); at === slides.length-1 ? enter() : show(at+1); }
+    else if(e.key === "ArrowLeft"){ e.preventDefault(); show(at-1); }
+  });
+  show(0);
+})();
+
+/* ------------------------------------------------------------------
+   Shelving your own. Persisted through the db capability when the
+   viewer has it; the starter shelf above works either way.
+------------------------------------------------------------------- */
+var addwrap = document.getElementById("addwrap");
+var addpanel = document.getElementById("addpanel");
+var addnote = document.getElementById("addnote");
+var saveBook = null;
+
+function restock(){
+  BOOKS = BASE.concat(EXTRA);
+  render();
+}
+function toBook(id, v){
+  return {
+    id:"u"+id, t:String(v.title||"Untitled"), url:String(v.url||"#"),
+    kind:String(v.kind||"added"), note:String(v.note||""),
+    x:clamp(Number(v.x)||0,-1,1), y:clamp(Number(v.y)||0,-1,1), mine:true
+  };
+}
+
+/* Inside a Claude artifact the shelf is backed by the shared store.
+   Hosted anywhere else there is no store, so additions live in this
+   browser instead — same panel, narrower promise. */
+var LS = "aha.books.v1";
+function localBooks(){
+  try{ var v = JSON.parse(localStorage.getItem(LS)); return Array.isArray(v) ? v : []; }
+  catch(e){ return []; }
+}
+function useLocal(){
+  addwrap.classList.add("on");
+  EXTRA = localBooks().map(function(v,i){ return toBook("l"+i, v); });
+  restock();
+  saveBook = function(rec){
+    return new Promise(function(res, rej){
+      var all = localBooks();
+      all.push(rec);
+      try{ localStorage.setItem(LS, JSON.stringify(all)); }
+      catch(e){ rej({code:"no_storage"}); return; }
+      EXTRA = all.map(function(v,i){ return toBook("l"+i, v); });
+      restock();
+      res();
+    });
+  };
+}
+
+if(window.claude && typeof window.claude.use === "function"){
+  window.claude.use("db").then(function(db){
+    if(!db){ useLocal(); return; }
+    addwrap.classList.add("on");
+    saveBook = function(rec){ return db.collection("books").add(rec); };
+    db.collection("books").onSnapshot(function(snap){
+      EXTRA = snap.docs.map(function(d){ return toBook(d.id, d.data() || {}); });
+      restock();
+    }, function(){ addnote.textContent = "Saved books are unavailable right now."; });
+  }).catch(useLocal);
+} else {
+  useLocal();
+}
+
+document.getElementById("addbtn").addEventListener("click", function(e){
+  e.stopPropagation();
+  addpanel.classList.toggle("on");
+  if(addpanel.classList.contains("on")) document.getElementById("f-title").focus();
+});
+addpanel.addEventListener("pointerdown", function(e){ e.stopPropagation(); });
+
+document.getElementById("savebtn").addEventListener("click", function(e){
+  e.stopPropagation();
+  var t = document.getElementById("f-title").value.trim();
+  var u = document.getElementById("f-url").value.trim();
+  if(!t){ addnote.textContent = "It needs a title."; return; }
+  if(!saveBook){ addnote.textContent = "Can't save from this view."; return; }
+  if(u && !/^https?:\/\//i.test(u)) u = "https://" + u;
+  var rec = {
+    title:t, url:u||"#",
+    kind:document.getElementById("f-kind").value.trim() || "added",
+    note:document.getElementById("f-note").value.trim() || "Added to this shelf.",
+    x:Number(document.getElementById("f-x").value)/100,
+    y:Number(document.getElementById("f-y").value)/100,
+    addedAt:new Date().toISOString()
+  };
+  addnote.textContent = "Shelving…";
+  saveBook(rec).then(function(){
+    addnote.textContent = "Shelved at " + (rec.y>=0?"R":"S") + (rec.x>=0?"T":"C") + ".";
+    ["f-title","f-url","f-kind","f-note"].forEach(function(id){ document.getElementById(id).value = ""; });
+  }).catch(function(err){
+    var code = err && err.code;
+    addnote.textContent = code === "not_granted" ? "Saving isn't available in this view."
+      : code === "no_storage" ? "This browser won't let the page save."
+      : "That didn't save. Try again.";
+  });
+});
+})();
+</script>
+</body>
+</html>
