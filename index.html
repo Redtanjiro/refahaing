@@ -258,6 +258,11 @@ a{color:inherit}
 .tx{animation:travelX 6s ease-in-out infinite}
 .ty{animation:travelY 6s ease-in-out infinite}
 .txy{animation:travelXY 6s ease-in-out infinite}
+.sectionhead{
+  margin:0 0 clamp(30px,4.2vw,50px);
+  font-family:var(--display);font-weight:400;text-align:center;
+  font-size:clamp(25px,2.8vw,34px);letter-spacing:-.034em;line-height:1;
+}
 .panels{
   display:grid;grid-template-columns:repeat(3,1fr);
   width:100%;max-width:1180px;margin:0 auto;text-align:left;
@@ -305,6 +310,7 @@ a{color:inherit}
   .panel:first-child{border-top:0;padding-top:0}
   .panel:last-child{padding-bottom:0}
   .plabel{margin-bottom:10px}
+  .sectionhead{margin-bottom:26px}
   .stage{overflow-y:auto;-webkit-overflow-scrolling:touch;align-content:start;padding-bottom:10px}
   .slide[data-s="0"],.slide[data-s="2"]{align-self:center;margin:auto 0}
 }
@@ -492,6 +498,7 @@ a{color:inherit}
     </section>
 
     <section class="slide" data-s="1">
+      <h2 class="sectionhead">how it works</h2>
       <div class="panels">
 
         <figure class="panel">
