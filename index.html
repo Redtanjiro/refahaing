@@ -195,29 +195,34 @@ a{color:inherit}
   transition:opacity .44s ease;
 }
 #intro.gone{opacity:0;pointer-events:none}
-.stage{
-  flex:1;display:grid;place-items:center;
-  padding:clamp(20px,4vw,48px) clamp(16px,4vw,48px) 0;
-  min-height:0;
-}
+.stage{flex:1;position:relative;z-index:1;min-height:0}
 .slide{
-  grid-area:1/1;width:100%;max-width:1180px;text-align:center;
+  position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
   opacity:0;pointer-events:none;transform:translateY(12px);
   transition:opacity .4s ease, transform .44s cubic-bezier(.22,.9,.28,1);
 }
 .slide.on{opacity:1;pointer-events:auto;transform:none}
+/* min-height plus flex centring: centred while it fits, top-aligned and
+   scrollable once it doesn't — never centred-and-clipped */
+.sheet{
+  min-height:100%;width:100%;max-width:1180px;margin:0 auto;
+  padding:clamp(20px,4vw,48px) clamp(16px,5vw,48px);
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  text-align:center;
+}
 
 .wordmark{
   margin:0;font-family:var(--display);font-weight:400;font-style:italic;
-  font-size:clamp(64px,11.5vw,146px);letter-spacing:-.042em;line-height:.9;
+  font-size:clamp(80px,19vw,146px);letter-spacing:-.042em;line-height:.9;
 }
 .tagline{
   margin:12px 0 0;font-family:var(--display);font-weight:400;
-  font-size:clamp(19px,2.4vw,30px);letter-spacing:-.034em;line-height:1.1;
+  font-size:clamp(19px,4.5vw,30px);letter-spacing:-.034em;line-height:1.2;text-wrap:balance;
 }
 .signoff{
   margin:0;font-style:italic;
-  font-size:clamp(19px,2.3vw,28px);letter-spacing:-.05em;line-height:1.25;
+  font-size:clamp(20px,4.4vw,28px);letter-spacing:-.05em;line-height:1.3;
+  max-width:22ch;text-wrap:balance;
 }
 
 /* ---- the diagrams demonstrate the mechanism, on a loop ---- */
@@ -299,8 +304,10 @@ a{color:inherit}
 .dots button[aria-current="true"]{background:var(--yellow)}
 #back[hidden]{visibility:hidden;display:inline-flex}
 #skip{
+  position:absolute;z-index:3;
+  right:clamp(16px,3vw,40px);top:clamp(16px,2.4vw,28px);
   font-size:12px;letter-spacing:-.08em;color:var(--fog);
-  position:absolute;right:clamp(16px,3vw,40px);top:clamp(16px,2.4vw,28px);
+  padding:6px 8px;margin:-6px -8px;
 }
 #skip:hover{color:var(--ink)}
 
@@ -311,8 +318,6 @@ a{color:inherit}
   .panel:last-child{padding-bottom:0}
   .plabel{margin-bottom:10px}
   .sectionhead{margin-bottom:26px}
-  .stage{overflow-y:auto;-webkit-overflow-scrolling:touch;align-content:start;padding-bottom:10px}
-  .slide[data-s="0"],.slide[data-s="2"]{align-self:center;margin:auto 0}
 }
 
 /* ---------- the reading room: the one charcoal band ---------- */
@@ -374,6 +379,7 @@ a{color:inherit}
 
 /* the board: flat stock, hairline rule, stamped title. No artwork. */
 .face.back{
+  pointer-events:none;
   transform:rotateY(180deg);
   background:var(--board,var(--sand));
   color:var(--boardink,var(--ink));
@@ -417,9 +423,12 @@ a{color:inherit}
   margin:0;font-size:clamp(15px,1.15vw,18px);letter-spacing:-.06em;line-height:1.28;
 }
 .spacer{flex:1;min-height:14px}
-#locator{display:block;width:100%;max-width:168px;height:auto;margin:14px 0 12px}
-#b-coord{font-size:16px;letter-spacing:-.08em;line-height:1.2;font-variant-numeric:tabular-nums}
-#b-near{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:2px;align-self:stretch}
+#b-coord{
+  align-self:flex-end;text-align:right;
+  font-size:16px;letter-spacing:-.08em;line-height:1.2;
+  font-variant-numeric:tabular-nums;color:var(--fog);
+}
+#b-near{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:2px;align-self:stretch}
 #b-near button{
   display:flex;align-items:center;gap:9px;width:100%;text-align:left;
   font-size:16px;letter-spacing:-.08em;line-height:1.2;
@@ -427,10 +436,35 @@ a{color:inherit}
 }
 #b-near button:hover{background:var(--sand)}
 #b-near .chip{width:9px;height:18px;flex:none;border-radius:5px;border:1px solid var(--ink)}
-#b-visit{margin-top:16px;text-decoration:none}
+#b-visit{margin-top:4px;text-decoration:none}
+#b-visit .short{display:none}
+
+/* a two-page spread on a phone leaves each leaf about 125px wide, so the
+   type steps down and the link becomes a full-width pill */
+@media (max-width:560px){
+  .leaf{padding:14px}
+  .page.l .leaf{padding-right:17px}
+  .page.r .leaf{padding-left:17px}
+  #b-title{font-size:20px;margin-top:11px;line-height:1.05}
+  #b-note{font-size:13.5px;line-height:1.3}
+  .hair{margin:11px 0}
+  #b-coord{font-size:13.5px}
+  .label{font-size:11px}
+  .tag{font-size:11px;padding:4px 6px;letter-spacing:-.06em}
+  #b-near button{font-size:13.5px;padding:4px 5px;gap:7px}
+  #b-near .chip{width:7px;height:14px}
+  #b-visit{
+    width:100%;justify-content:center;margin-top:10px;
+    padding:11px 12px;font-size:14px;
+  }
+  #b-visit .long{display:none}
+  #b-visit .short{display:inline}
+  .gut{width:26px}
+}
 
 #shut{position:fixed;top:clamp(16px,2.4vw,28px);right:clamp(16px,3vw,40px);z-index:22;display:none}
 #bookstage.on ~ #shut{display:inline-flex}
+#bookstage.on ~ #addwrap{display:none}
 
 /* ---------- shelving panel ---------- */
 #addwrap{position:fixed;z-index:6;right:clamp(16px,3vw,40px);bottom:clamp(16px,2.4vw,28px);display:none}
@@ -493,11 +527,14 @@ a{color:inherit}
 
   <div class="stage">
     <section class="slide on" data-s="0">
-      <h1 class="wordmark">Aha!</h1>
-      <p class="tagline">Adding the aha to ref - aha - ing</p>
+      <div class="sheet">
+        <h1 class="wordmark">Aha!</h1>
+        <p class="tagline">Adding the aha to ref - aha - ing</p>
+      </div>
     </section>
 
     <section class="slide" data-s="1">
+      <div class="sheet">
       <h2 class="sectionhead">how it works</h2>
       <div class="panels">
 
@@ -586,10 +623,13 @@ a{color:inherit}
           <figcaption>The books will ruffle as you move the cursor, and you can use the arrows to see more in the same area.</figcaption>
         </figure>
       </div>
+      </div>
     </section>
 
     <section class="slide" data-s="2">
-      <p class="signoff">and that&rsquo;s about ahall of it, hehe sorry last one.</p>
+      <div class="sheet">
+        <p class="signoff">and that&rsquo;s about ahall of it, hehe sorry last one.</p>
+      </div>
     </section>
   </div>
 
@@ -626,14 +666,12 @@ a{color:inherit}
       <div class="page r">
         <div class="face front">
         <div class="leaf">
-          <div class="label">where it sits</div>
-          <svg id="locator" viewBox="0 0 150 150" aria-hidden="true"></svg>
-          <div id="b-coord">&nbsp;</div>
+          <a id="b-visit" class="pill action" href="#" target="_blank" rel="noopener noreferrer">&nbsp;</a>
           <div class="hair"></div>
           <div class="label">shelved beside</div>
           <ul id="b-near"></ul>
           <div class="spacer"></div>
-          <a id="b-visit" class="pill action" href="#" target="_blank" rel="noopener noreferrer">&nbsp;</a>
+          <div id="b-coord">&nbsp;</div>
         </div>
         <div class="gut"></div>
         </div>
@@ -1003,7 +1041,7 @@ function bookGeom(){
   var W = window.innerWidth, H = window.innerHeight;
   var bw = W < 560 ? 18 : 24;
   var pw = clamp((W - 56 - bw)/2, 132, 340);
-  var ph = clamp(Math.min(H*0.70, pw*1.30), 250, 500);
+  var ph = clamp(Math.min(H*0.72, pw*(W < 560 ? 2.05 : 1.30)), 250, 540);
   return {bw:bw, pw:pw, ph:ph};
 }
 
@@ -1033,22 +1071,11 @@ function fillBook(b){
   var a = document.getElementById("b-visit");
   if(b.url && b.url !== "#"){
     a.href = b.url;
-    a.textContent = b.url.replace(/^https?:\/\//,"").replace(/^www\./,"").replace(/\/$/,"") + " \u2197";
+    a.innerHTML = '<span class="long"></span><span class="short">open</span>\u2009\u2197';
+    a.querySelector(".long").textContent =
+      b.url.replace(/^https?:\/\//,"").replace(/^www\./,"").replace(/\/$/,"");
     a.style.display = "";
   } else { a.style.display = "none"; }
-
-  /* the locator: this book's place in the same four quadrants */
-  var px = 16 + (b.x+1)/2*118, py = 16 + (1-b.y)/2*118;
-  document.getElementById("locator").innerHTML =
-    '<rect x="4" y="4" width="142" height="142" fill="none" stroke="#000" stroke-width="1" opacity=".3"/>' +
-    '<line x1="75" y1="4" x2="75" y2="146" stroke="#000" stroke-width="1" opacity=".55"/>' +
-    '<line x1="4" y1="75" x2="146" y2="75" stroke="#000" stroke-width="1" opacity=".55"/>' +
-    '<g fill="#2f2c29" opacity=".6" font-family="Inter, sans-serif" font-size="10" letter-spacing="-.03em">' +
-      '<text x="79" y="15">ref</text><text x="79" y="143">res</text>' +
-      '<text x="8" y="71">cre</text><text x="142" y="71" text-anchor="end">tec</text>' +
-    '</g>' +
-    '<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="11" fill="none" stroke="#000" stroke-width="1" opacity=".45"/>' +
-    '<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="5.5" fill="'+st.fill+'" stroke="#000" stroke-width="1"/>';
 
   /* nearest neighbours in the space */
   var near = BOOKS.filter(function(o){ return o.id !== b.id; }).map(function(o){
