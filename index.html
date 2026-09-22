@@ -107,7 +107,16 @@ a{color:inherit}
   font-family:var(--display);font-style:italic;
   font-size:20px;letter-spacing:-.034em;line-height:1;
   transform:translate(-50%,-50%);pointer-events:none;
+  animation:knotnudge 3.4s ease-in-out 1.4s 3 both;
 }
+/* the whole interaction depends on knowing the handle moves, so it breathes
+   until the first grab — then never again */
+@keyframes knotnudge{
+  0%,74%,100%{transform:translate(-50%,-50%) scale(1)}
+  82%{transform:translate(-50%,-50%) scale(1.07)}
+  90%{transform:translate(-50%,-50%) scale(1)}
+}
+#field.touched #knot{animation:none}
 
 .axlabel{
   position:absolute;z-index:1;
@@ -502,9 +511,22 @@ a{color:inherit}
   #b-title{font-size:22px}
   .stamped{font-size:17px}
 }
+/* touch: every control clears the 44px minimum */
+@media (pointer:coarse){
+  .pager{width:44px;height:44px;font-size:19px}
+  #shut{padding:11px 20px}
+  #skip{font-size:14px;padding:12px 14px;margin:-12px -14px}
+}
+/* "+ shelve a book" sat on top of the "resources" axis label on a phone.
+   Narrow screens get the same affordance as a circle, echoing the pagers. */
+@media (max-width:560px){
+  #addbtn{width:44px;height:44px;padding:0;gap:0;justify-content:center;font-size:23px}
+  #addbtn .long{display:none}
+}
 @media (prefers-reduced-motion: reduce){
   .spine,.spine .body,.page,.leaf,#bookflip,.spine::after{transition:none !important}
   .an{animation:none !important}
+  #knot{animation:none !important}
 }
 </style>
 </head>
@@ -701,7 +723,7 @@ a{color:inherit}
     <button id="savebtn" class="pill action">shelve it</button>
     <p id="addnote"></p>
   </div>
-  <button id="addbtn" class="pill">+ shelve a book</button>
+  <button id="addbtn" class="pill" aria-label="Shelve a book">+<span class="long"> shelve a book</span></button>
 </div>
 
 <script>
@@ -853,6 +875,9 @@ var els = {};        /* id -> spine element */
 
 function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
 
+var COARSE = false;
+try{ COARSE = window.matchMedia("(pointer:coarse)").matches; }catch(e){}
+
 function geom(){
   var W = window.innerWidth, H = window.innerHeight;
   var n = clamp(Math.floor(W/88), 4, 11);
@@ -860,10 +885,15 @@ function geom(){
   var padX = half + 26;
   var minX = Math.max(padX, W*0.13), maxX = Math.min(W-padX, W*0.87);
   if(minX > maxX){ minX = maxX = W/2; }
-  var minY = H*0.40, maxY = H*0.74;
+  /* A phone held upright has vertical room the desktop layout never uses.
+     Give the crosshair more travel and the shelf more height: the drag gains
+     range and the spine titles stop truncating. Desktop is left alone. */
+  var tall = H/W > 1.7 && W < 760;
+  var minY = H*(tall ? 0.34 : 0.40), maxY = H*(tall ? 0.78 : 0.74);
   var labFS = clamp(W*0.046, 26, 68);
   var labTop = W < 640 ? 42 : 54;
-  var maxH = Math.max(64, Math.min(clamp(H*0.20, 78, 190), minY - (labTop + labFS*1.05 + 18)));
+  var maxH = Math.max(64, Math.min(clamp(H*(tall ? 0.235 : 0.20), 78, tall ? 210 : 190),
+                                   minY - (labTop + labFS*1.05 + 18)));
   return {W:W,H:H,n:n,maxH:maxH,minH:maxH*0.54,minX:minX,maxX:maxX,
           minY:minY,maxY:maxY,labFS:labFS,labTop:labTop};
 }
@@ -937,9 +967,10 @@ function render(){
   shelf.style.width = totalW+"px";
   shelf.style.height = G.maxH+"px";
 
-  prevB.style.left = Math.round(X - totalW/2 - 26)+"px";
+  var pr = (COARSE ? 22 : 17) + 4;
+  prevB.style.left = Math.round(clamp(X - totalW/2 - 26, pr, G.W - pr))+"px";
   prevB.style.top  = Math.round(Y - G.maxH*0.55)+"px";
-  nextB.style.left = Math.round(X + totalW/2 + 26)+"px";
+  nextB.style.left = Math.round(clamp(X + totalW/2 + 26, pr, G.W - pr))+"px";
   nextB.style.top  = Math.round(Y - G.maxH*0.55)+"px";
   prevB.disabled = page===0;
   nextB.disabled = page===maxPage;
@@ -1211,7 +1242,15 @@ function hashSync(){
 }
 
 field.addEventListener("pointerdown", function(e){
-  if(e.target.closest(".spine, .pager")) return;
+  /* The shelf stands on the horizontal axis — exactly where the handle sits —
+     so without this the spines swallow every grab that starts on the one object
+     that looks grabbable. Hit-test the knot first, with a thumb's worth of slop,
+     and let it win the gesture. */
+  var kr = knot.getBoundingClientRect();
+  var onKnot = Math.hypot(e.clientX - (kr.x + kr.width/2),
+                          e.clientY - (kr.y + kr.height/2)) <= kr.width/2 + 12;
+  if(!onKnot && e.target.closest(".spine, .pager")) return;
+  field.classList.add("touched");
   dragging = true; moved = 0;
   lastX = e.clientX; lastY = e.clientY;
   field.classList.add("dragging");
