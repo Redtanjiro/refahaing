@@ -799,7 +799,36 @@ var RAW = [
 ["Material Design 3","https://m3.material.io","guidelines","A full system documented end to end, tokens included.",0.76,0.60],
 ["Shopify Polaris","https://polaris.shopify.com","guidelines","A production design system with its reasoning written down.",0.66,0.54],
 ["Inclusive Components","https://inclusive-components.design","reference","How to build the common components so they work for everyone.",0.82,0.72],
-["ARIA Authoring Practices","https://www.w3.org/WAI/ARIA/apg/","spec","Keyboard and semantics patterns, straight from the source.",0.90,0.78]
+["ARIA Authoring Practices","https://www.w3.org/WAI/ARIA/apg/","spec","Keyboard and semantics patterns, straight from the source.",0.90,0.78],
+["Recent.design","https://recent.design","gallery","Fresh web design, sortable by category. SaaS is the deep end.",-0.12,0.62],
+["Supahero","https://supahero.io","gallery","Hero sections only. The first screen, collected.",-0.18,0.50],
+["Land-book","https://land-book.com/sections/case-study","gallery","Landing pages broken into sections. The case-study cut is the useful one.",-0.04,0.66],
+["Refero","https://refero.design/web-apps","library","Real web-app screens, searchable by pattern and flow.",0.40,0.88],
+["Refero Styles","https://styles.refero.design/style/9be20798-843b-424c-bc87-192edc0cce22","index","Brand styles pulled apart into tokens. Aha!'s Streamtime look came from here.",0.12,0.72],
+["Uiverse","https://uiverse.io/elements","library","Open-source buttons, loaders and toggles in plain HTML and CSS.",0.48,-0.70],
+["Motion Primitives","https://motion-primitives.com/docs/magnetic","library","Small React motion pieces. Start with Magnetic.",0.68,-0.50],
+["Kokonut UI","https://kokonutui.com/docs/navigation/smooth-drawer","library","Tailwind and Motion components. The smooth drawer is the one to steal.",0.76,-0.54],
+["Cult UI","https://www.cult-ui.com/docs/components/pixel-heading-word","library","shadcn-flavoured components with some personality, pixel headings included.",0.64,-0.32],
+["Skiper UI","https://skiper-ui.com/components","library","Scroll and interaction effects for Next.js, shadcn-compatible.",0.72,-0.40],
+["Casberry Particles","https://particles.casberry.in","generator","Shape a 20,000-particle WebGL swarm, then export it as JS or React.",0.40,-0.38],
+["21st.dev ASCII Editor","https://21st.dev/community/ascii/editor","generator","Turn a photo into ASCII, pixel, mosaic or glitch art.",-0.10,-0.54],
+["Design Spells","https://designspells.com/?tag=fun","gallery","Tiny moments of delight, collected one detail at a time.",-0.02,0.80],
+["Wall of Portfolios","https://www.wallofportfolios.in/?company=All","gallery","UX and product portfolios, filterable by where the designer works.",-0.40,0.60],
+["Rishika Gupta","https://www.wallofportfolios.in/portfolios/rishika-gupta/","case studies","One portfolio worth reading closely for how the case studies are paced.",-0.44,0.46],
+["Webzibition","https://tympanus.net/codrops/webzibition/","gallery","Codrops' running exhibition of sites with interesting front-end craft.",0.10,0.60],
+["Godly Footers","https://godly.design/footer/","gallery","The bottom of the page, taken seriously.",-0.28,0.56],
+["Loadmo.re","https://loadmo.re","gallery","Mobile sites that refuse to be a stack of cards.",-0.24,0.86],
+["Stripe Press","https://press.stripe.com","book","A publisher's site that makes every book feel like an object.",-0.62,0.82],
+["Riyadh Air by FutureBrand","https://www.futurebrand.com/our-work/riyadh-air","case studies","An airline identity built from the ground up, shown across every touchpoint.",-0.56,0.76],
+["Fitbit Ace LTE by Koto","https://koto.com/projects/fitbit-ace-lte","case studies","A kids' wearable branded as a game, not a gadget.",-0.50,0.84],
+["Daikuhara by KEI","https://kei-inc.jp/projects/daikuhara-kintsugi-antique/","case studies","Kintsugi shop identity. Quiet, hand-made, and very patient.",-0.80,0.66],
+["Blueprint Case Study","https://blueprintapps.io/cases/contract-to-hire-proven-fit/","case studies","A recruitment firm's case study, laid out better than most design ones.",0.20,0.44],
+["Remix","https://remix.run/#use-cases","case studies","A framework homepage that tells its story as you scroll.",0.36,0.46],
+["MotionSites","https://motionsites.ai","library","Prompts for getting animated, art-directed sites out of AI builders.",0.06,-0.30],
+["NEAT","https://neat.firecms.co","generator","Animated 3D gradient backgrounds, tuned live and exported as code.",0.20,-0.80],
+["Mint Playground","https://play.mint.gg","generator","AI agents that generate, rig and animate 3D models and worlds.",0.50,-0.66],
+["ASCII Magic","https://www.ascii-magic.com/app","generator","Photos and video into animated ASCII, with a hundred-odd styles.",-0.20,-0.66],
+["Space Type Generator","https://spacetypegenerator.com","generator","Kinetic type sketches you can bend, loop and record.",-0.62,-0.40]
 ];
 
 function mk(r,i,mine){
@@ -829,19 +858,18 @@ var TYPE_OF = {
   research:"report",
   guidelines:"standard", spec:"standard"
 };
-/* Stock is assigned by how common the type is: the eleven sample books
-   and nine manuals get quiet neutrals, the rarest types get the loud
+/* Stock is assigned by how common the type is: the most common types get quiet neutrals, the rarest types get the loud
    accents. A saturated spine therefore means "this one is unusual",
-   and Sun Yellow appears twice in sixty-four, so it keeps its authority. */
+   and Sun Yellow appears twice in ninety-three, so it keeps its authority. */
 var STOCK = {
   sample:   {fill:"#eadcce", ink:"#000000", name:"sample book"},      /* 11 */
-  manual:   {fill:"#fbf8f5", ink:"#000000", name:"manual"},           /*  9 */
-  technical:{fill:"#c3b7ac", ink:"#000000", name:"technical volume"}, /*  9 */
-  monograph:{fill:"#c6dc3c", ink:"#000000", name:"monograph"},        /*  8 */
+  manual:   {fill:"#fbf8f5", ink:"#000000", name:"manual"},           /* 15 */
+  technical:{fill:"#c3b7ac", ink:"#000000", name:"technical volume"}, /* 16 */
+  monograph:{fill:"#c6dc3c", ink:"#000000", name:"monograph"},        /* 16 */
   archive:  {fill:"#ee84d5", ink:"#000000", name:"archive"},          /*  6 */
-  catalogue:{fill:"#6483ff", ink:"#ffffff", name:"catalogue"},        /*  6 */
+  catalogue:{fill:"#6483ff", ink:"#ffffff", name:"catalogue"},        /*  7 */
   handbook: {fill:"#c1f32b", ink:"#000000", name:"handbook"},         /*  5 */
-  journal:  {fill:"#ffffff", ink:"#000000", name:"journal"},          /*  4 */
+  journal:  {fill:"#ffffff", ink:"#000000", name:"journal"},          /* 11 */
   standard: {fill:"#2f2c29", ink:"#fbf8f5", name:"standard"},         /*  4 */
   report:   {fill:"#ffde3b", ink:"#000000", name:"report"}            /*  2 */
 };
